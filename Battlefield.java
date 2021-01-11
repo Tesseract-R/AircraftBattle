@@ -64,7 +64,7 @@ public class Battlefield  extends Frame{
     boolean locationreflesh=false;
     Airplane Controlplane,Controlplane1;
     ControlplaneAdvance controller,controller1;//飞机控制相关
-    Bullettype nmlBullet,shotBullet,biBullet;//普通子弹 散弹 双列子弹
+    Bullettype playerBullet, nmlBullet,shotBullet,biBullet;//普通子弹 散弹 双列子弹
     Accessorytype lives,boxs,oil,bibox,shotbox,shield,smasher,stoneleft,stoneright;
     //道具类型:生命，箱子，油罐，双排子弹箱，散弹箱，盾牌，加速器
    	ArrayList<Bullet> bulletsList;
@@ -148,9 +148,10 @@ public class Battlefield  extends Frame{
     }
 	public void gameperpare(){
 		controller=new ControlplaneAdvance();
-        nmlBullet=new Bullettype(20,bullet);
-        shotBullet=new Bullettype(20,bullet);
-        biBullet=new Bullettype(2,bullet);
+		playerBullet=new Bullettype(20,"player",bullet);
+        nmlBullet=new Bullettype(20,"computer",bullet);  // 敌机发出的子弹
+        shotBullet=new Bullettype(20,"player",bullet);
+        biBullet=new Bullettype(2,"player",bullet);
 		lives = new Accessorytype(1,a1);
 		boxs = new Accessorytype(2,a2);
 		oil=new Accessorytype(3,a3);
@@ -163,11 +164,11 @@ public class Battlefield  extends Frame{
 		
 		if(mode.biperson) {
         	controller1=new ControlplaneAdvance();
-        	Controlplane1=new Airplane(700,500,80,66,nmlBullet,controller1);
+        	Controlplane1=new Airplane(700,500,80,66,playerBullet,controller1);
             Controlplane1.speed=10;
-            Controlplane=new Airplane(300,500,80,66,nmlBullet,controller);
+            Controlplane=new Airplane(300,500,80,66,playerBullet,controller);
         }else {
-        	Controlplane=new Airplane(500,500,80,66,nmlBullet,controller);
+        	Controlplane=new Airplane(500,500,80,66,playerBullet,controller);
         }
         
         Controlplane.speed=10;
@@ -477,29 +478,29 @@ public class Battlefield  extends Frame{
      	        } 
 //子弹
     	   if (fire){
-    		   if(Controlplane.bullettype==nmlBullet) {
-    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2-3,Controlplane.pY,13,13,nmlBullet,controller,1));
+    		   if(Controlplane.bullettype==playerBullet) {
+    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2-3,Controlplane.pY,13,13,Controlplane.bullettype,controller,1));
     		   }else if(Controlplane.bullettype==shotBullet) {
-    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2-3,Controlplane.pY,13,13,shotBullet,1,controller,1));
-    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2-3,Controlplane.pY,13,13,shotBullet,2,controller,1));
-    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2-3,Controlplane.pY,13,13,shotBullet,3,controller,1));
+    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2-3,Controlplane.pY,13,13,Controlplane.bullettype,1,controller,1));
+    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2-3,Controlplane.pY,13,13,Controlplane.bullettype,2,controller,1));
+    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2-3,Controlplane.pY,13,13,Controlplane.bullettype,3,controller,1));
     		   }else if(Controlplane.bullettype==biBullet) {
-    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2+4,Controlplane.pY,13,13,biBullet,controller,1));
-    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2-10,Controlplane.pY,13,13,biBullet,controller,1));
+    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2+4,Controlplane.pY,13,13,Controlplane.bullettype,controller,1));
+    			   bulletsList.add(new Bullet(Controlplane.pX+Controlplane.pWidth/2-10,Controlplane.pY,13,13,Controlplane.bullettype,controller,1));
     		   }
     		   fire=false;
     	   //t1.setText(Controlplane.bulletnum+"");  
            }
     	   if (mode.biperson&&fire1){
-    		   if(Controlplane1.bullettype==nmlBullet) {
-    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2-3,Controlplane1.pY,13,13,nmlBullet,controller1,2));
+    		   if(Controlplane1.bullettype==playerBullet) {
+    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2-3,Controlplane1.pY,13,13,Controlplane.bullettype,controller1,2));
     		   }else if(Controlplane1.bullettype==shotBullet) {
-    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2-3,Controlplane1.pY,13,13,shotBullet,1,controller1,2));
-    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2-3,Controlplane1.pY,13,13,shotBullet,2,controller1,2));
-    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2-3,Controlplane1.pY,13,13,shotBullet,3,controller1,2));
+    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2-3,Controlplane1.pY,13,13,Controlplane.bullettype,1,controller1,2));
+    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2-3,Controlplane1.pY,13,13,Controlplane.bullettype,2,controller1,2));
+    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2-3,Controlplane1.pY,13,13,Controlplane.bullettype,3,controller1,2));
     		   }else if(Controlplane1.bullettype==biBullet) {
-    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2+4,Controlplane1.pY,13,13,biBullet,controller1,2));
-    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2-10,Controlplane1.pY,13,13,biBullet,controller1,2));
+    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2+4,Controlplane1.pY,13,13,Controlplane.bullettype,controller1,2));
+    			   bulletsList.add(new Bullet(Controlplane1.pX+Controlplane1.pWidth/2-10,Controlplane1.pY,13,13,Controlplane.bullettype,controller1,2));
     		   }
     		   fire1=false;
     	   //t1.setText(Controlplane.bulletnum+"");  
@@ -1028,8 +1029,8 @@ class Startaction implements ActionListener{
 class Saveaction implements ActionListener{
     @SuppressWarnings("deprecation")
 	public void actionPerformed(ActionEvent event) {                    
-        d1.suspend();
-        d2.suspend();
+        d1.checkAccess();
+        d2.checkAccess();
         ObjectOutputStream oos;
 		try {
 			File f=new File("save/save.dat");
@@ -1047,8 +1048,8 @@ class Saveaction implements ActionListener{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        d1.resume();
-        d2.resume();
+        d1.checkAccess();
+        d2.checkAccess();
     }   
 }
 class Loadaction implements ActionListener{

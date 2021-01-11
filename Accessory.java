@@ -15,7 +15,7 @@ public class Accessory implements Serializable {
 	
 	public Accessory(Accessorytype atype_in){
 		  aX=getRandomIntNum(50,950);
-		  aY=30;
+		  aY=0;
 		  aWidth=32;
 		  aHeight=32;
 		  atype=atype_in;
@@ -39,11 +39,12 @@ public class Accessory implements Serializable {
 	public boolean hit(Airplane p){
 		if ((aX-+aWidth<p.pX) && (p.pX<aX+aWidth) && (aY<p.pY) && (p.pY<aY+aHeight)){
 			//life-=60;
-			p.life-=60;
+			if (p.controlled)
+				p.life-=60;
 			return true;
 		} else return false;
-		
-	}	
+	}
+
 	public int getRandomIntNum(int a, int b)
 	{
 	  Random random = new Random();

@@ -30,7 +30,6 @@ public Airplane(int x,int y,int w,int h,Bullettype btype){
   bullettype=btype;
   controlled=false;
   bespecial=false;
-  
 }
 public Airplane(int x,int y,int w,int h,Bullettype btype,Accessorytype atype_in){
 	super();
@@ -82,77 +81,84 @@ public Airplane(Bullettype btype,Accessorytype atype_in){
 }
 public boolean hit(Bullet b){
 	if ((pX<b.bX) && (b.bX<pX+pWidth) && (pY<b.bY) && (b.bY<pY+pHeight)){
-		if(controlled==false)
-			life=life-b.power;
-		else {
-			if(b.power>controller.baseDefense);
-				life=life-b.power+controller.baseDefense;
-		}
+//		if(controlled==false)
+//			life=life-b.power;
+//		else {
+//			if(b.power>controller.baseDefense);
+//				life=life-b.power+controller.baseDefense;
+//		}
+        if (b.bullettype.bulletFrom.equals("player") & !controlled){
+            life=life-b.power;
+        }
+        if(b.bullettype.bulletFrom.equals("computer") & controlled){
+            if(b.power>controller.baseDefense)
+                life=life-b.power+controller.baseDefense;
+        }
 		return true;
 	} else return false;
 	
 }
 public boolean hit(Airplane p){
 	if ((pX-pWidth<p.pX) && (p.pX<pX+pWidth) && (pY<p.pY) && (p.pY<pY+pHeight)){
-		if(controlled==true&&p.controlled==true)return true;
-		if(controlled==false)
-			life-=120;
-		else {
-			if(120>controller.baseDefense)
+		if(controlled && p.controlled)return true;
+		if(controlled){
+			if(120>controller.baseDefense){
 				life=life-120+controller.baseDefense;
+                p.life-=120;
+			}
 		}
-		p.life-=120;
 		return true;
 	} else return false;
-	
 }
+
 public boolean hit(Accessory a){
 	if ((pX<a.aX) && (a.aX<pX+pWidth) && (pY<a.aY) && (a.aY<pY+pHeight)){
-       if(a.atype.beequipment==true) {
-    	   if(controlled==true) {
-    		   bullettype=a.atype.btype;
-    		   return true;
-    		   }
-    	   else return false;
-       }
-       if(controlled==true) {
-    	   if(a.atype.id==6) {
-    		   controller.tempDefense=controller.baseDefense;
-    		   controller.baseDefense=9999;
-    		   java.util.Timer timer = new java.util.Timer(true);
-    		   TimerTask task = new TimerTask() {
-    			    public void run() {    
-    			    	controller.baseDefense=controller.tempDefense;
-    			    }    
-    			};
-    			timer.schedule(task, 3000);   
-    			}
-    	   if(a.atype.id==7) {
-    		   controller.speedincrement=5;
-    		   java.util.Timer timer = new java.util.Timer(true);
-    		   TimerTask task = new TimerTask() {
-    			    public void run() {    
-    			    	controller.speedincrement=0;
-    			    }    
-    			};
-    			timer.schedule(task, 3000);   
-    			}
-       }
-       switch(a.atype.id) {
-       case 1:life+=50;break;
-       case 3:oil+=50;break;
-       case 8:life-=100;break;
-       default:break;
-       }
-
+        if(controlled) {
+            if (a.atype.beequipment) {
+                bullettype = a.atype.btype;
+            }
+            if (a.atype.id == 6) {
+                controller.tempDefense = controller.baseDefense;
+                controller.baseDefense = 9999;
+                java.util.Timer timer = new java.util.Timer(true);
+                TimerTask task = new TimerTask() {
+                    public void run() {
+                        controller.baseDefense = controller.tempDefense;
+                    }
+                };
+                timer.schedule(task, 3000);
+            }
+            if (a.atype.id == 7) {
+                controller.speedincrement = 5;
+                java.util.Timer timer = new java.util.Timer(true);
+                TimerTask task = new TimerTask() {
+                    public void run() {
+                        controller.speedincrement = 0;
+                    }
+                };
+                timer.schedule(task, 3000);
+            }
+            switch (a.atype.id) {
+                case 1:
+                    life += 50;
+                    break;
+                case 3:
+                    oil += 50;
+                    break;
+                case 8:
+                    life -= 100;
+                    break;
+                default:
+                    break;
+            }
+        }
 		return true;
 	} else return false;
-	
 }
 public void fly(){
     count++;
 	 if (pY%200==0) {
-  	  Xoffset=(getRandomIntNum(0, 2)-1);
+  	  Xoffset=(getRandomIntNum(0, 4)-2);
 
     }
     if  (pX<50)  Xoffset=1;
