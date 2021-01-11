@@ -154,7 +154,7 @@ public boolean hit(Accessory a){
 public void fly(){
     count++;
 	 if (pY%200==0) {
-  	  Xoffset=(getRandomIntNum(0, 3)-2);
+  	  Xoffset=(getRandomIntNum(0, 2)-1);
 
     }
     if  (pX<50)  Xoffset=1;

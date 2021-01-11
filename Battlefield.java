@@ -629,6 +629,10 @@ public class Battlefield  extends Frame{
  	   }
  	}
 	}
+
+	/**
+	 * 按键反应
+	 */
   class MyKeyListener implements KeyListener{
 	  Airplane Cplane=Controlplane;
 	  Airplane Cplane1=Controlplane1;
@@ -696,7 +700,8 @@ public class Battlefield  extends Frame{
 	 	      else if(key == keyboard[4])
 	 	      {
 	 	    	 key_flag[4]=true;
-	 	      } else if(key == keyboard1[0])
+	 	      }
+	 	      else if(key == keyboard1[0])
 	 	      {
 	 			  key_flag1[0]=true;
 	 	      }
@@ -767,10 +772,10 @@ public class Battlefield  extends Frame{
 
   public void showcomponent(){
 	   MenuBar m_MenuBar = new MenuBar(); 
-	   Menu menuFile = new Menu("文件");     //创建菜单
+	   Menu menuFile = new Menu("MenuFile");     //创建菜单
 	   m_MenuBar.add(menuFile);                 //将菜单加入菜单条
-	   MenuItem  f1 =  new MenuItem("打开");   //创建各菜单项
-	   MenuItem  f2 = new MenuItem("关闭");
+	   MenuItem  f1 =  new MenuItem("Open");   //创建各菜单项
+	   MenuItem  f2 = new MenuItem("Close");
 	   menuFile.add(f1);                                       //加入菜单
 	   menuFile.add(f2);
        setMenuBar(m_MenuBar);  
@@ -779,61 +784,61 @@ public class Battlefield  extends Frame{
 	    add(p1,"North");
 	    p1.setLayout(new GridLayout(1,10)); 
 	    if(mode.biperson) {
-   	    p1.add(new Label("生命值"),0);
+   	    p1.add(new Label("Health"),0);
 	    t1 = new TextField(3);
 	    p1.add(t1,1);
 	    t2 = new TextField(3);
 	    p1.add(t2,2);
-   	    p1.add(new Label("油量"),3);
+   	    p1.add(new Label("Oil"),3);
 	    t3 = new TextField(3);
 	    p1.add(t3,4);
 	    t4 = new TextField(3);
 	    p1.add(t4,5);
-        start=new Button("开始");	
+        start=new Button("Start");
         p1.add(start,6);
 	    start.addActionListener(new Startaction());
-        save=new Button("保存");	
+        save=new Button("Save");
         p1.add(save,7);
         save.addActionListener(new Saveaction());
-        load=new Button("加载");	
+        load=new Button("Load");
         p1.add(load,8);
 	    }else {
 	    	if(mode.endless) {
-	    		p1.add(new Label("生命值"),0);
+	    		p1.add(new Label("Health"),0);
 			    t1 = new TextField(3);
 			    p1.add(t1,1);
-		   	    p1.add(new Label("油量"),2);
+		   	    p1.add(new Label("Oil"),2);
 			    t3 = new TextField(3);
 			    p1.add(t3,3);
-			    p1.add(new Label("等级"),4);
+			    p1.add(new Label("Level"),4);
 			    t5 = new TextField(3);
 			    p1.add(t5,5);
-			    p1.add(new Label("经验值"),6);
+			    p1.add(new Label("EXP"),6);
 			    t6 = new TextField(3);
 			    p1.add(t6,7);
-		        start=new Button("开始");	
+		        start=new Button("Start");
 		        p1.add(start,8);
 			    start.addActionListener(new Startaction());
-		        save=new Button("保存");	
+		        save=new Button("Save");
 		        p1.add(save,9);
 		        save.addActionListener(new Saveaction());
-		        load=new Button("加载");	
+		        load=new Button("Load");
 		        p1.add(load,10);
 	    	}
 	    	else {
-	   	    p1.add(new Label("生命值"),0);
+	   	    p1.add(new Label("Health"),0);
 		    t1 = new TextField(3);
 		    p1.add(t1,1);
-	   	    p1.add(new Label("油量"),2);
+	   	    p1.add(new Label("Oil"),2);
 		    t3 = new TextField(3);
 		    p1.add(t3,3);
-	        start=new Button("开始");	
+	        start=new Button("Start");
 	        p1.add(start,4);
 		    start.addActionListener(new Startaction());
-	        save=new Button("保存");	
+	        save=new Button("Save");
 	        p1.add(save,5);
 	        save.addActionListener(new Saveaction());
-	        load=new Button("加载");	
+	        load=new Button("Load");
 	        p1.add(load,6);
 	    	}
 	        
@@ -1002,7 +1007,6 @@ class Displayer extends Thread {
 		 m1.clip.stop();
 		 m1=null;
 		 start.enable();
-		 
 	}
 }
 class Startaction implements ActionListener{
@@ -1012,10 +1016,12 @@ class Startaction implements ActionListener{
     	gameover=0;
     	start.disable(); 
 		gamebegin();
-		
- 
     }   
 }
+
+	/**
+	 * 保存
+	 */
 class Saveaction implements ActionListener{
     @SuppressWarnings("deprecation")
 	public void actionPerformed(ActionEvent event) {                    
@@ -1109,6 +1115,10 @@ class Loadaction implements ActionListener{
 
     }   
 }
+
+	/**
+	 * 背景音乐
+	 */
 class Backgroudmusic {
 	@SuppressWarnings("deprecation")
 	AudioClip clip;
@@ -1121,6 +1131,10 @@ class Backgroudmusic {
 	}catch (Exception e) {};
    }
  }
+
+	/**
+	 * 音效
+	 */
 class Scenemusic {
 	File gunshot,explode,beep,hit,eat;
 	@SuppressWarnings("deprecation")
