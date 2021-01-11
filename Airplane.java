@@ -1,6 +1,4 @@
 import java.awt.*;
-import java.awt.image.*;
-import java.awt.geom.*;
 import java.io.*;
 import java.util.*;
 
@@ -161,9 +159,9 @@ public void fly(){
     if  (pX>950)  Xoffset=-1;
 	 pX+=Xoffset;	
   if (count>=intervel){
-	     if (pY>500) eplane=2;
-	     if (pY<50) eplane=1;
-	     if ((pY>500)||(pY<50)) speed=-speed;  
+	     if (pY>300) eplane=2;
+	     if (pY<0) eplane=1;
+	     if ((pY>300)||(pY<0)) speed=-speed;
      pY+=speed; 
      count=0;
      }

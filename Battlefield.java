@@ -175,7 +175,7 @@ public class Battlefield  extends Frame{
         
         
         p2.addKeyListener(new MyKeyListener(controlflag,controlflag1));
-        
+		m1=new Backgroudmusic();
         m2=new Scenemusic();
 	}
 	public void gamebegin(){
@@ -199,7 +199,7 @@ public class Battlefield  extends Frame{
 					 }	
 					};
 		timer2 = new Timer();
-		timer2.schedule(task2,3000,3000);
+		timer2.schedule(task2,3000,3000); // 每三秒钟油量减5
 
 //	    TimerTask task3=new TimerTask(){
 //			 public void run(){
@@ -770,7 +770,10 @@ public class Battlefield  extends Frame{
 	 	   }	   
 	    }
 
-  public void showcomponent(){
+	/**
+	 * 显示菜单
+	 */
+	public void showcomponent(){
 	   MenuBar m_MenuBar = new MenuBar(); 
 	   Menu menuFile = new Menu("MenuFile");     //创建菜单
 	   m_MenuBar.add(menuFile);                 //将菜单加入菜单条
@@ -899,7 +902,7 @@ public static void main(String args[]){
             f.setVisible(true);
             fs.dispose();
             f.gameperpare();
-            //f.gamebegin();
+//            f.gamebegin();
         }
     });
     b2.addActionListener(new ActionListener() {
@@ -1110,8 +1113,7 @@ class Loadaction implements ActionListener{
 	    	d2=new Displayer();
 	    	d1.start();
 	        d2.start();
-	        m1=new Backgroudmusic();
-	        m1.run();
+
 
     }   
 }

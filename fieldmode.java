@@ -1,8 +1,5 @@
-import java.awt.*;
-import java.awt.image.*;
-import java.awt.geom.*;
 import java.io.*;
-import java.util.*;
+
 
 public class fieldmode implements Serializable {
 	boolean biperson;//Ë«ÈËÄ£Ê½
