@@ -64,7 +64,7 @@ public class Battlefield  extends Frame{
     boolean locationreflesh=false;
     Airplane Controlplane,Controlplane1;
     ControlplaneAdvance controller,controller1;//飞机控制相关
-    Bullettype playerBullet, nmlBullet,shotBullet,biBullet;//普通子弹 散弹 双列子弹
+    Bullettype playerBullet,nmlBullet,shotBullet,biBullet;//普通子弹 散弹 双列子弹
     Accessorytype lives,boxs,oil,bibox,shotbox,shield,smasher,stoneleft,stoneright;
     //道具类型:生命，箱子，油罐，双排子弹箱，散弹箱，盾牌，加速器
    	ArrayList<Bullet> bulletsList;
@@ -319,70 +319,70 @@ public class Battlefield  extends Frame{
 			}    		   
 		    addplane=false;
            }
-    	  Iterator<Airplane> pnums = planeList.iterator();
-    	   while(pnums.hasNext()) { 
-    		      Airplane p = pnums.next(); 
-                  p.fly();
-                 if (p.eplane==1) drawOffScreen.drawImage(Airplane.eplane1,p.pX,p.pY,null);  
-                 if (p.eplane==2) drawOffScreen.drawImage(Airplane.eplane2,p.pX,p.pY,null);  
+    	    Iterator<Airplane> pnums = planeList.iterator();
+    	    while(pnums.hasNext()) {
+    	   		Airplane p = pnums.next();
+    	   		p.fly();
+    	   		if (p.eplane==1) drawOffScreen.drawImage(Airplane.eplane1,p.pX,p.pY,null);
+    	   		if (p.eplane==2) drawOffScreen.drawImage(Airplane.eplane2,p.pX,p.pY,null);
                  
-                  //发射子弹
-     		     if ((p.getRandomIntNum(0, 300))==2)  {
-     		    	 if(p.bullettype==nmlBullet) {
-     		    		 Bullet b2=new Bullet(p.pX+p.pWidth/2-3,p.pY+p.pHeight,13,13,nmlBullet);
-     		    		 b2.speed=-3;
-     		    		 bulletsList.add(b2);     
-     		    	 }
-     		       }
-    		      //判断是否被击中?
-    		      Iterator<Bullet> bnums = bulletsList.iterator();
-    	    	   while(bnums.hasNext()) { 
-    	  		      Bullet b = bnums.next(); 
-    	  		      if (p.hit(b)) {
-    	  		    	  if(b.parent_id==1) {
+    	   		//发射子弹
+				if ((p.getRandomIntNum(0, 300))==2)  {
+					if(p.bullettype==nmlBullet) {
+						Bullet b2=new Bullet(p.pX+p.pWidth/2-3,p.pY+p.pHeight,13,13,nmlBullet);
+						b2.speed=-1;
+						bulletsList.add(b2);
+					}
+				}
+				//判断是否被击中?
+				Iterator<Bullet> bnums = bulletsList.iterator();
+				while(bnums.hasNext()) {
+					Bullet b = bnums.next();
+					if (p.hit(b) & b.bullettype.bulletFrom.equals("player")) {
+						if(b.parent_id==1) {
     	  		    		Controlplane.controller.exp+=20;
     	  		    		if(Controlplane.controller.exp%500==0) {
     	  		    			Controlplane.controller.exp=0;
     	  		    			Controlplane.controller.level+=1;
     	  		    		}
-    	  		    	  }
-    	  		    	  if(mode.endless) {
-    	  		    		  t5.setText(Controlplane.controller.level+""); 
+						}
+						if(mode.endless) {
+							t5.setText(Controlplane.controller.level+"");
     	  		    		t6.setText(Controlplane.controller.exp+"");
-    	  		    	  }
-    	 		    	  b=null;
-    	 		    	  bnums.remove();
-    	 		    	  m2.hitclip.play();
-    	 		          };  		      
+						}
+						b=null;
+						bnums.remove();
+						m2.hitclip.play();
+					}
     	  	       //判断是否撞击控制飞机
-    	 		     if (p.hit(Controlplane)) 
- 	 		    	  m2.explodeclip.play();
-    	 		    if (mode.biperson&&p.hit(Controlplane1)) 
-   	 		    	  m2.explodeclip.play();
-    	    	   } 
+					if (p.hit(Controlplane))
+						m2.explodeclip.play();
+    	 		    if (mode.biperson&&p.hit(Controlplane1))
+    	 		    	m2.explodeclip.play();
+				}
     	    	   
-    	    	   //判断是否撞击附件
-     		      Iterator<Accessory> anums =accessoryList.iterator();
-      	    	   while(anums.hasNext()) { 
-      	    	    	Accessory a = anums.next(); 
-      	  		        if (p.hit(a)){
-      	  		        t1.setText(Controlplane.life+"");
-      	 		    	  a=null;
-    	 		    	  anums.remove();	
-         		    	  m2.beepclip.stop();
-         		    	  m2.eatclip.play();
-       	  		        };
-   	    	        } 
-    	    	   if (p.life<0) {
-    	    		  if(p.bespecial==true)
-    	    			  accessoryList.add(new Accessory(p.pX,p.pY,p.atype));
-    		    	  explodeList.add(new Explode(p.pX,p.pY));
-    		    	  p=null;
-    		    	  pnums.remove();
-  	 		    	  m2.explodeclip.play();
-    		          };  		    
-    	   } 
-//附件
+				//判断是否撞击附件
+				Iterator<Accessory> anums =accessoryList.iterator();
+				while(anums.hasNext()) {
+					Accessory a = anums.next();
+					if (p.hit(a) & p.controlled){
+						t1.setText(Controlplane.life+"");
+						a=null;
+						anums.remove();
+						m2.beepclip.stop();
+						m2.eatclip.play();
+					}
+				}
+				if (p.life<0) {
+					if(p.bespecial)
+						accessoryList.add(new Accessory(p.pX,p.pY,p.atype));
+					explodeList.add(new Explode(p.pX,p.pY));
+					p=null;
+					pnums.remove();
+					m2.explodeclip.play();
+				}
+    	   }
+    	    //附件
     	   if (hasAccessory){
     		   int temp;
     		   if(mode.advance) {
@@ -549,7 +549,7 @@ public class Battlefield  extends Frame{
 		      };
  	        } 
     	    if (gameover==0) {
-    	    	if(Controlplane.controller.over==false)
+    	    	if(!Controlplane.controller.over)
     	    		if(mode.endless) {
     	    			switch(Controlplane.controller.level) {
     	    			case 1:myplane=myplaneL1;break;

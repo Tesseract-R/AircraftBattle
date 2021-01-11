@@ -36,14 +36,6 @@ public class Accessory implements Serializable {
 		} else return false;
 		
 	}
-	public boolean hit(Airplane p){
-		if ((aX-+aWidth<p.pX) && (p.pX<aX+aWidth) && (aY<p.pY) && (p.pY<aY+aHeight)){
-			//life-=60;
-			if (p.controlled)
-				p.life-=60;
-			return true;
-		} else return false;
-	}
 
 	public int getRandomIntNum(int a, int b)
 	{

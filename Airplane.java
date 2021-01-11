@@ -185,23 +185,15 @@ public void moveToleft(){
 public void moveToRihgt(){
 	
 }
-public int getRandomIntNum(int a, int b)
-{
-  Random random = new Random();
-	
-  int c = random.nextInt();
+public int getRandomIntNum(int a, int b) {
+    Random random = new Random();
+    int c = random.nextInt();
 //这里用到了Random里的nextInt()方法，这个方法会随机产生一个 int 型的数；
-  if(c<0)
-  {
-    c = -c ;
-  }
-
-  int d = ((c %(b-a)) + a + 1);
-
+    if(c<0) {
+        c = -c ;
+    }
+    int d = ((c %(b-a)) + a + 1);
 //这里是让变量d变成a和b之中的数， % 是取余运算；
-  
-return d;
-
+    return d;
 }
-
 }
