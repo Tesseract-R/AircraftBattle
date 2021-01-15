@@ -58,15 +58,19 @@
 
 
 ### （个人笔记）代码解读
+
 战场大小：1000(x)*900(y)
 
-Airplane类：
+#### Airplane类：
+
 eplane：标记敌机飞行的方向，为1的时候贴图airplane4.gif，机头朝下，为2的时候敌机向上飞，贴图airplane4-1.gif，机头朝上
 
 
-Battlefield类：
+#### Battlefield类：
+
 Line 367 （敌机发射子弹）
-···java
+
+```java
 if ((p.getRandomIntNum(0, 300))==2)  {
 		if(p.bullettype==nmlBullet) {
 		Bullet b2=new Bullet(p.pX+p.pWidth/2-3,p.pY+p.pHeight,13,13,nmlBullet);
@@ -74,5 +78,6 @@ if ((p.getRandomIntNum(0, 300))==2)  {
 		bulletsList.add(b2);
 	}
 }
-···
+```
+
 修改随机数的范围可控制敌机子弹的密度
