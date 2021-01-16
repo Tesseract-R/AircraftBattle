@@ -48,6 +48,8 @@
     drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
     ```
 
+- 修改背景图片
+
 - 血量低于一定值时画面变红
     - 实现原理：更换背景
     
