@@ -44,9 +44,9 @@
     - 玩家子弹正向、修改颜色使其更易分辨
     - 敌机斜射的子弹有倾斜角度
     
-	```java
-	drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
-	```
+    ```java
+    drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
+    ```
 
 - 血量低于一定值时画面变红
     - 实现原理：更换背景
@@ -59,26 +59,25 @@
 	
 	```java
 	if (!Controlplane.controller.over && locationreflesh) {
-                if (!mode.biperson) locationreflesh = false;
-                if (controlflag[0])
-                    Controlplane.pX += Controlplane.speed + Controlplane.controller.speedincrement;
-                if (controlflag[1])
-                    Controlplane.pX -= Controlplane.speed + Controlplane.controller.speedincrement;
-                if (controlflag[2])
-                    Controlplane.pY -= Controlplane.speed + Controlplane.controller.speedincrement;
-                if (controlflag[3])
-                    Controlplane.pY += Controlplane.speed + Controlplane.controller.speedincrement;
-                if (Controlplane.pX>1000)
-                    Controlplane.pX -= 1000;
-                if (Controlplane.pX<-30)
-                    Controlplane.pX += 1000;
-                if (Controlplane.pY>850)
-                    Controlplane.pY = 850;
-                if (Controlplane.pY<0)
-                    Controlplane.pY = 0;
+	    if (!mode.biperson) locationreflesh = false;
+	    if (controlflag[0])
+		Controlplane.pX += Controlplane.speed + Controlplane.controller.speedincrement;
+	    if (controlflag[1])
+		Controlplane.pX -= Controlplane.speed + Controlplane.controller.speedincrement;
+	    if (controlflag[2])
+		Controlplane.pY -= Controlplane.speed + Controlplane.controller.speedincrement;
+	    if (controlflag[3])
+		Controlplane.pY += Controlplane.speed + Controlplane.controller.speedincrement;
+	    if (Controlplane.pX>1000)
+		Controlplane.pX -= 1000;
+	    if (Controlplane.pX<-30)
+		Controlplane.pX += 1000;
+	    if (Controlplane.pY>850)
+		Controlplane.pY = 850;
+	    if (Controlplane.pY<0)
+		Controlplane.pY = 0;
         }
 	```
-    
     
 ---
 
