@@ -43,10 +43,10 @@
 - 修改子弹类型的贴图
     - 玩家子弹正向、修改颜色使其更易分辨
     - 敌机斜射的子弹有倾斜角度
-
-```java
-drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
-```
+    
+	```java
+	drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
+	```
 
 - 血量低于一定值时画面变红
     - 实现原理：更换背景
@@ -56,6 +56,7 @@ drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
   竖直方向上设定飞机飞行的范围
     - 实现原理：
         - Battlefield中 Line 691 更新位置
+	
 	```java
 	if (!Controlplane.controller.over && locationreflesh) {
                 if (!mode.biperson) locationreflesh = false;
@@ -75,7 +76,7 @@ drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
                     Controlplane.pY = 850;
                 if (Controlplane.pY<0)
                     Controlplane.pY = 0;
-            }
+        }
 	```
     
     
