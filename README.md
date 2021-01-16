@@ -47,6 +47,36 @@
 ```java
 drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
 ```
+
+- 血量低于一定值时画面变红
+    - 实现原理：更换背景
+    
+- 设置画面边界，或者从左端出去可以自右端回来，不然可以卡bug
+  水平方向上飞机飞出边界可以从右侧出现
+  竖直方向上设定飞机飞行的范围
+    - 实现原理：
+        - Battlefield中 Line 691 更新位置
+	```java
+	if (!Controlplane.controller.over && locationreflesh) {
+                if (!mode.biperson) locationreflesh = false;
+                if (controlflag[0])
+                    Controlplane.pX += Controlplane.speed + Controlplane.controller.speedincrement;
+                if (controlflag[1])
+                    Controlplane.pX -= Controlplane.speed + Controlplane.controller.speedincrement;
+                if (controlflag[2])
+                    Controlplane.pY -= Controlplane.speed + Controlplane.controller.speedincrement;
+                if (controlflag[3])
+                    Controlplane.pY += Controlplane.speed + Controlplane.controller.speedincrement;
+                if (Controlplane.pX>1000)
+                    Controlplane.pX -= 1000;
+                if (Controlplane.pX<-30)
+                    Controlplane.pX += 1000;
+                if (Controlplane.pY>850)
+                    Controlplane.pY = 850;
+                if (Controlplane.pY<0)
+                    Controlplane.pY = 0;
+            }
+	```
     
     
 ---
@@ -54,7 +84,6 @@ drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
 ### 待修改部分：
 
 - 减慢敌机速度
-- 设置画面边界，或者从左端出去可以自右端回来，不然可以卡bug
 - 补给箱 - 双发和散弹的贴图有所区分
 
 ### 高阶-新增特性
