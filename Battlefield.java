@@ -76,7 +76,7 @@ public class Battlefield extends Frame {
     fieldmode mode;
     Image OffScreen1, OffScreen2, O2;
     Graphics2D drawOffScreen1, drawOffScreen2, g;
-    Image myplane, myplane1, eplane1, eplane2, bullet, bullet_p, bullet_l, bullet_r, explode, backgroud, a1, a2, a3, a4, gameoverimage, winimage, myplaneL1, myplaneL2, myplaneL3;
+    Image myplane, myplane1, eplane1, eplane2, bullet, bullet_p, bullet_l, bullet_r, explode, backgroud, background_red, a1, a2, a3, a4, gameoverimage, winimage, myplaneL1, myplaneL2, myplaneL3;
     int key;
     boolean flag1, flag2;
     boolean controlflag[] = new boolean[5];
@@ -159,6 +159,7 @@ public class Battlefield extends Frame {
         bullet_r = getToolkit().getImage("Bullets/Bullet11+45.gif");
         explode = getToolkit().getImage("Bullets/explosion.gif");
         backgroud = getToolkit().getImage("Backgrounds/bg.jpg");
+        background_red = getToolkit().getImage("Backgrounds/bg_red.jpg");
         gameoverimage = getToolkit().getImage("accessory/gameover.gif");
         winimage = getToolkit().getImage("accessory/win.gif");
 
@@ -312,14 +313,17 @@ public class Battlefield extends Frame {
 
     @SuppressWarnings("deprecation")
     public void gameContrl(Graphics2D drawOffScreen) {
-
+        m1.clip.play();
         if (mode.advance && isSleep) {
             drawOffScreen.drawImage(winimage, 450, 300, null);
         } else {
 //控制
 
             //   	 drawOffScreen.fillRect(0, 0, 1000, 900);
-            drawOffScreen.drawImage(backgroud, 0, 0, 1000, 900, 0, (int) backy, 360, 320 + (int) backy, null);
+            if (Controlplane.life < 50)
+                drawOffScreen.drawImage(background_red, 0, 0, 1000, 900, 0, (int) backy, 360, 320 + (int) backy, null);
+            else
+                drawOffScreen.drawImage(backgroud, 0, 0, 1000, 900, 0, (int) backy, 360, 320 + (int) backy, null);
             backy -= .2;
             //  System.out.println((int)backy+"");
             if (backy < 0) backy = 638;
@@ -368,7 +372,7 @@ public class Battlefield extends Frame {
                 if (p.eplane == 2) drawOffScreen.drawImage(Airplane.eplane2, p.pX, p.pY, null);
 
                 //敌机发射子弹
-                if ((p.getRandomIntNum(0, 300)) == 2) {
+                if ((p.getRandomIntNum(0, 500)) == 2) {
                     if (p.bullettype == nmlBullet) {
                         int shot_id = getRandomIntNum(1, 4);
                         switch (shot_id) {
@@ -588,6 +592,9 @@ public class Battlefield extends Frame {
                     b = null;
                     bnums.remove();
                     m2.hitclip.play();
+                    // 屏幕闪红或抖动
+//                    drawOffScreen.drawImage(background_red, 0, 0, 1000, 900, 0, (int) backy, 360, 320 + (int) backy, null);
+
                     t1.setText(Controlplane.life + "");
 
                     t3.setText(Controlplane.oil + "");
@@ -670,7 +677,7 @@ public class Battlefield extends Frame {
             Iterator<Explode> enums = explodeList.iterator();
             while (enums.hasNext()) {
                 Explode e = enums.next();
-                drawOffScreen.drawImage(explode, e.eX, e.eY, null);
+                drawOffScreen.drawImage(e.eimage, e.eX, e.eY, null);
                 e.life--;
 
                 if (e.life < 0) {
@@ -680,7 +687,8 @@ public class Battlefield extends Frame {
                 ;
             }
             //g.drawImage(OffScreen1,0,0,this.p2);
-//更新位置
+
+            //更新位置
             if (!Controlplane.controller.over && locationreflesh) {
                 if (!mode.biperson) locationreflesh = false;
                 if (controlflag[0])
@@ -691,6 +699,14 @@ public class Battlefield extends Frame {
                     Controlplane.pY -= Controlplane.speed + Controlplane.controller.speedincrement;
                 if (controlflag[3])
                     Controlplane.pY += Controlplane.speed + Controlplane.controller.speedincrement;
+                if (Controlplane.pX>1000)
+                    Controlplane.pX -= 1000;
+                if (Controlplane.pX<-30)
+                    Controlplane.pX += 1000;
+                if (Controlplane.pY>850)
+                    Controlplane.pY = 850;
+                if (Controlplane.pY<0)
+                    Controlplane.pY = 0;
             }
 
             if (mode.biperson && (!Controlplane1.controller.over) && locationreflesh) {
@@ -910,7 +926,7 @@ public class Battlefield extends Frame {
     public static void main(String[] args) {
 
         JFrame fs = new JFrame("模式选择");
-        fs.setSize(1000, 900);
+        fs.setSize(1000, 1000);
         //fs.setLocation(580, 240);
         fs.setLayout(null);
         JButton b1 = new JButton("单人模式");
@@ -940,7 +956,7 @@ public class Battlefield extends Frame {
                     }
                 });
                 f.showcomponent();
-                f.setSize(1000, 900);
+                f.setSize(1000, 1000);
                 f.setVisible(true);
                 fs.dispose();
                 f.gameperpare();
@@ -958,7 +974,7 @@ public class Battlefield extends Frame {
                     }
                 });
                 f.showcomponent();
-                f.setSize(1000, 900);
+                f.setSize(1000, 1000);
                 f.setVisible(true);
                 fs.dispose();
                 f.gameperpare();
@@ -977,7 +993,7 @@ public class Battlefield extends Frame {
                     }
                 });
                 f.showcomponent();
-                f.setSize(1000, 900);
+                f.setSize(1000, 1000);
                 f.setVisible(true);
                 fs.dispose();
                 f.gameperpare();
@@ -998,7 +1014,7 @@ public class Battlefield extends Frame {
                 });
                 //f.showPrologue(drawOffScreen1);
                 f.showcomponent();
-                f.setSize(1000, 900);
+                f.setSize(1000, 1000);
                 f.setVisible(true);
                 fs.dispose();
                 f.gameperpare();
