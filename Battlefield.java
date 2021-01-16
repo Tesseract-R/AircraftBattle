@@ -323,10 +323,10 @@ public class Battlefield extends Frame {
             if (Controlplane.life < 50)
                 drawOffScreen.drawImage(background_red, 0, 0, 1000, 900, 0, (int) backy, 360, 320 + (int) backy, null);
             else
-                drawOffScreen.drawImage(backgroud, 0, 0, 1000, 900, 0, (int) backy, 360, 320 + (int) backy, null);
-            backy -= .2;
+                drawOffScreen.drawImage(backgroud, 0, 0, 1000, 900, 0, (int) backy, 1242, 1117 + (int) backy, null);
+            backy -= .15;
             //  System.out.println((int)backy+"");
-            if (backy < 0) backy = 638;
+            if (backy < 0) backy = 3763;
 
             //  drawOffScreen.drawImage(backgroud,0,0,1000,900,null);
             if (addplane) {
@@ -648,7 +648,7 @@ public class Battlefield extends Frame {
                 Controlplane.controller.over = true;
                 m2.explodeclip.play();
             }
-            ;
+
             if (mode.biperson) {
                 if ((Controlplane1.life < 0) || (Controlplane1.oil < 0)) {
                     if (!flag2)
