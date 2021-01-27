@@ -11,10 +11,11 @@ public class Explode implements Serializable {
     int life = 10;
     transient Image eimage;
 
-    public Explode(int x, int y) {
+    public Explode(int x, int y, Image eimage_in) {
         super();
         eX = x;
         eY = y;
+        eimage = eimage_in;
     }
 
     public void hit() {

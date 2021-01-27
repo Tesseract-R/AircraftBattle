@@ -6,10 +6,10 @@ import java.util.*;
 import java.io.*;
 import java.applet.*;
 import java.net.*;
+import java.util.Timer;
 
-import javax.swing.ButtonGroup;
-import javax.swing.JFrame;
-import javax.swing.JButton;
+import javax.imageio.stream.ImageInputStream;
+import javax.swing.*;
 import javax.swing.JFrame;
 
 class Flag {
@@ -76,7 +76,7 @@ public class Battlefield extends Frame {
     fieldmode mode;
     Image OffScreen1, OffScreen2, O2;
     Graphics2D drawOffScreen1, drawOffScreen2, g;
-    Image myplane, myplane1, eplane1, eplane2, bullet, bullet_p, bullet_l, bullet_r, explode, backgroud, background_red, a1, a2, a3, a4, gameoverimage, winimage, myplaneL1, myplaneL2, myplaneL3;
+    Image myplane, myplane1,myplane2, eplane1, eplane2, bullet, bullet_p, bullet_l, bullet_r, explode, backgroud, background_red, a1, a2, a3, a4, gameoverimage, winimage, myplaneL1, myplaneL2, myplaneL3;
     int key;
     boolean flag1, flag2;
     boolean controlflag[] = new boolean[5];
@@ -112,6 +112,8 @@ public class Battlefield extends Frame {
     boolean isSleep = true;
 
     Flag flag;
+    int Difficulty; // 难度设置：敌机子弹伤害、子弹密度会变化
+    int planeSelect;
     //////
 
     ////////
@@ -134,8 +136,18 @@ public class Battlefield extends Frame {
         OffScreen2 = new BufferedImage(1000, 900, BufferedImage.TYPE_INT_RGB);
         drawOffScreen2 = (Graphics2D) OffScreen2.getGraphics();
         mode = mode_in;
+        Difficulty = mode.degree;
+        planeSelect = mode.planeSelect;
         flag = new Flag();
-        myplane = getToolkit().getImage("Airplanes/airplane3.gif");
+        if(planeSelect==1){
+            myplane = getToolkit().getImage("Airplanes/airplane3.gif");
+            bullet_p = getToolkit().getImage("Bullets/Bullet11p.gif");
+        }
+        else if(planeSelect==2){
+            myplane = getToolkit().getImage("Airplanes/airplane17.gif");
+            bullet_p = getToolkit().getImage("Bullets/Bullet12p.gif");
+        }
+
         if (mode.biperson)
             myplane1 = getToolkit().getImage("Airplanes/airplane14.gif");
 
@@ -154,7 +166,6 @@ public class Battlefield extends Frame {
         Airplane.eplane1 = eplane1;
         Airplane.eplane2 = eplane2;
         bullet = getToolkit().getImage("Bullets/Bullet11.gif");
-        bullet_p = getToolkit().getImage("Bullets/Bullet11p.gif");
         bullet_l = getToolkit().getImage("Bullets/Bullet11-45.gif");
         bullet_r = getToolkit().getImage("Bullets/Bullet11+45.gif");
         explode = getToolkit().getImage("Bullets/explosion.gif");
@@ -172,9 +183,9 @@ public class Battlefield extends Frame {
     public void gameperpare() {
         controller = new ControlplaneAdvance();
         playerBullet = new Bullettype(20, "player", bullet_p);
-        nmlBullet = new Bullettype(20, "computer", bullet);  // 敌机发出的子弹
-        nmlBullet_l = new Bullettype(20, "computer", bullet_l);
-        nmlBullet_r = new Bullettype(20, "computer", bullet_r);
+        nmlBullet = new Bullettype(Difficulty*4+12, "computer", bullet);  // 敌机发出的子弹
+        nmlBullet_l = new Bullettype(Difficulty*4+12, "computer", bullet_l);
+        nmlBullet_r = new Bullettype(Difficulty*4+12, "computer", bullet_r);
         shotBullet = new Bullettype(20, "player", bullet_p);
         biBullet = new Bullettype(2, "player", bullet_p);
         lives = new Accessorytype(1, a1);
@@ -188,12 +199,23 @@ public class Battlefield extends Frame {
         stoneright = new Accessorytype(8, a4, false);
 
         if (mode.biperson) {
-            controller1 = new ControlplaneAdvance();
-            Controlplane1 = new Airplane(700, 500, 80, 66, playerBullet, controller1);
-            Controlplane1.speed = 10;
-            Controlplane = new Airplane(300, 500, 80, 66, playerBullet, controller);
+            if(planeSelect==1) {
+                controller1 = new ControlplaneAdvance();
+                Controlplane1 = new Airplane(700, 500, 80, 66, playerBullet, controller1);
+                Controlplane1.speed = 10;
+                Controlplane = new Airplane(300, 500, 80, 66, playerBullet, controller);
+            }
+            else if(planeSelect==2){
+                controller1 = new ControlplaneAdvance();
+                Controlplane1 = new Airplane(700, 500, 80, 66, biBullet, controller1);
+                Controlplane1.speed = 10;
+                Controlplane = new Airplane(300, 500, 80, 66, biBullet, controller);
+            }
         } else {
-            Controlplane = new Airplane(500, 500, 80, 66, playerBullet, controller);
+            if(planeSelect==1)
+                Controlplane = new Airplane(500, 500, 80, 66, playerBullet, controller);
+            else if(planeSelect==2)
+                Controlplane = new Airplane(500, 500, 80, 66, biBullet, controller);
         }
 
         Controlplane.speed = 10;
@@ -210,7 +232,7 @@ public class Battlefield extends Frame {
             @SuppressWarnings("deprecation")
             public void run() {
                 hasAccessory = true;
-                m2.beepclip.loop();
+//                m2.beepclip.loop();
             }
         };
         timer = new Timer();
@@ -220,6 +242,7 @@ public class Battlefield extends Frame {
             public void run() {
                 Controlplane.oil -= 5;
                 t3.setText(Controlplane.oil + "");
+                t4.setText(Controlplane.controller.score + Controlplane.life + Controlplane.oil + "");
                 if (mode.biperson) {
                     Controlplane1.oil -= 5;
                     t4.setText(Controlplane1.oil + "");
@@ -274,7 +297,6 @@ public class Battlefield extends Frame {
         flag1 = false;
         flag2 = false;
 
-
         g = (Graphics2D) this.p2.getGraphics();
         planeList.clear();
         bulletsList.clear();
@@ -314,110 +336,100 @@ public class Battlefield extends Frame {
     @SuppressWarnings("deprecation")
     public void gameContrl(Graphics2D drawOffScreen) {
         m1.clip.play();
-        if (mode.advance && isSleep) {
-            drawOffScreen.drawImage(winimage, 450, 300, null);
-        } else {
-//控制
+        //   	 drawOffScreen.fillRect(0, 0, 1000, 900);
+        if (Controlplane.life < 50)
+            drawOffScreen.drawImage(background_red, 0, 0, 1000, 900, 0, (int) backy, 1242, 1117 + (int) backy, null);
+        else
+            drawOffScreen.drawImage(backgroud, 0, 0, 1000, 900, 0, (int) backy, 1242, 1117 + (int) backy, null);
+        backy -= .15;
+        //  System.out.println((int)backy+"");
+        if (backy < 0) backy = 3763;
 
-            //   	 drawOffScreen.fillRect(0, 0, 1000, 900);
-            if (Controlplane.life < 50)
-                drawOffScreen.drawImage(background_red, 0, 0, 1000, 900, 0, (int) backy, 360, 320 + (int) backy, null);
-            else
-                drawOffScreen.drawImage(backgroud, 0, 0, 1000, 900, 0, (int) backy, 1242, 1117 + (int) backy, null);
-            backy -= .15;
-            //  System.out.println((int)backy+"");
-            if (backy < 0) backy = 3763;
-
-            //  drawOffScreen.drawImage(backgroud,0,0,1000,900,null);
-            if (addplane) {
-                if (planeList.size() < 15) {
-                    if (getRandomIntNum(1, 10) <= 5) {
-                        switch (getRandomIntNum(1, 10)) {
-                            case 2:
-                                planeList.add(new Airplane(nmlBullet, lives));
-                                break;
-                            case 3:
-                                planeList.add(new Airplane(nmlBullet, oil));
-                                break;
-                            case 4:
-                                planeList.add(new Airplane(nmlBullet, oil));
-                                break;
-                            case 5:
-                                planeList.add(new Airplane(nmlBullet, bibox));
-                                break;
-                            case 6:
-                                planeList.add(new Airplane(nmlBullet, shotbox));
-                                break;
-                            case 7:
-                                planeList.add(new Airplane(nmlBullet, shield));
-                                break;
-                            case 8:
-                                planeList.add(new Airplane(nmlBullet, smasher));
-                                break;
-                            default:
-                                planeList.add(new Airplane(nmlBullet, lives));
-                                break;
-                        }
-                    } else
-                        planeList.add(new Airplane(nmlBullet));
-                }
-                addplane = false;
+        //  drawOffScreen.drawImage(backgroud,0,0,1000,900,null);
+        if (addplane) {
+            if (planeList.size() < 15) {
+                if (getRandomIntNum(1, 10) <= 5) {
+                    switch (getRandomIntNum(1, 10)) {
+                        case 2:
+                            planeList.add(new Airplane(nmlBullet, lives));
+                            break;
+                        case 3:
+                            planeList.add(new Airplane(nmlBullet, oil));
+                            break;
+                        case 4:
+                            planeList.add(new Airplane(nmlBullet, oil));
+                            break;
+                        case 5:
+                            planeList.add(new Airplane(nmlBullet, bibox));
+                            break;
+                        case 6:
+                            planeList.add(new Airplane(nmlBullet, shotbox));
+                            break;
+                        case 7:
+                            planeList.add(new Airplane(nmlBullet, shield));
+                            break;
+                        case 8:
+                            planeList.add(new Airplane(nmlBullet, smasher));
+                            break;
+                        default:
+                            planeList.add(new Airplane(nmlBullet, lives));
+                            break;
+                    }
+                } else
+                    planeList.add(new Airplane(nmlBullet));
             }
-            // 判断敌机状态
-            Iterator<Airplane> pnums = planeList.iterator();
-            while (pnums.hasNext()) {
-                Airplane p = pnums.next();
-                p.fly();
-                if (p.eplane == 1) drawOffScreen.drawImage(Airplane.eplane1, p.pX, p.pY, null);
-                if (p.eplane == 2) drawOffScreen.drawImage(Airplane.eplane2, p.pX, p.pY, null);
+            addplane = false;
+        }
+        // 判断敌机状态
+        Iterator<Airplane> pnums = planeList.iterator();
+        while (pnums.hasNext()) {
+            Airplane p = pnums.next();
+            p.fly();
+            if (p.eplane == 1) drawOffScreen.drawImage(Airplane.eplane1, p.pX, p.pY, null);
+            if (p.eplane == 2) drawOffScreen.drawImage(Airplane.eplane2, p.pX, p.pY, null);
 
-                //敌机发射子弹
-                if ((p.getRandomIntNum(0, 500)) == 2) {
-                    if (p.bullettype == nmlBullet) {
-                        int shot_id = getRandomIntNum(1, 4);
-                        switch (shot_id) {
-                            case 2:
-                                Bullet b2 = new Bullet(p.pX + p.pWidth / 2 - 3, p.pY + p.pHeight, 13, 13, nmlBullet_l);
-                                b2.speed = -1;
-                                bulletsList.add(b2);
-                            case 4:
-                                b2 = new Bullet(p.pX + p.pWidth / 2 - 3, p.pY + p.pHeight, 13, 13, nmlBullet_r);
-                                b2.speed = -1;
-                                bulletsList.add(b2);
-                            default:
-                                b2 = new Bullet(p.pX + p.pWidth / 2 - 3, p.pY + p.pHeight, 13, 13, nmlBullet);
-                                b2.speed = -1;
-                                bulletsList.add(b2);
-                        }
+            //敌机发射子弹
+            if ((p.getRandomIntNum(0, (7-Difficulty)*100)) == 2) {
+                if (p.bullettype == nmlBullet) {
+                    int shot_id = getRandomIntNum(1, 4);
+                    switch (shot_id) {
+                        case 2:
+                            Bullet b2 = new Bullet(p.pX + p.pWidth / 2 - 3, p.pY + p.pHeight, 13, 13, nmlBullet_l);
+                            b2.speed = -1;
+                            bulletsList.add(b2);
+                        case 4:
+                            b2 = new Bullet(p.pX + p.pWidth / 2 - 3, p.pY + p.pHeight, 13, 13, nmlBullet_r);
+                            b2.speed = -1;
+                            bulletsList.add(b2);
+                        default:
+                            b2 = new Bullet(p.pX + p.pWidth / 2 - 3, p.pY + p.pHeight, 13, 13, nmlBullet);
+                            b2.speed = -1;
+                            bulletsList.add(b2);
                     }
                 }
+            }
 
-                //判断子弹状态
-                Iterator<Bullet> bnums = bulletsList.iterator();
-                while (bnums.hasNext()) {
-                    Bullet b = bnums.next();
-                    if (p.hit(b) & b.bullettype.bulletFrom.equals("player")) {
-                        if (b.parent_id == 1) {
-                            Controlplane.controller.exp += 20;
-                            if (Controlplane.controller.exp % 500 == 0) {
-                                Controlplane.controller.exp = 0;
-                                Controlplane.controller.level += 1;
-                            }
+            //判断子弹状态
+            Iterator<Bullet> bnums = bulletsList.iterator();
+            while (bnums.hasNext()) {
+                Bullet b = bnums.next();
+                if (p.hit(b) & b.bullettype.bulletFrom.equals("player")) {
+                    if (b.parent_id == 1) {
+                        Controlplane.controller.exp += 20;
+                        if (Controlplane.controller.exp % 500 == 0) {
+                            Controlplane.controller.exp = 0;
+                            Controlplane.controller.level += 1;
                         }
-                        if (mode.endless) {
-                            t5.setText(Controlplane.controller.level + "");
-                            t6.setText(Controlplane.controller.exp + "");
-                        }
-                        b = null;
-                        bnums.remove();
-                        m2.hitclip.play();
                     }
-                    //判断是否撞击控制飞机
-                    if (p.hit(Controlplane))
-                        m2.explodeclip.play();
-                    if (mode.biperson && p.hit(Controlplane1))
-                        m2.explodeclip.play();
+                    if (mode.endless) {
+                        t5.setText(Controlplane.controller.level + "");
+                        t6.setText(Controlplane.controller.exp + "");
+                    }
+                    b = null;
+                    bnums.remove();
+                    m2.hitclip.play();
                 }
+            }
 
 //				//判断附件状态
 //				Iterator<Accessory> anums =accessoryList.iterator();
@@ -431,296 +443,281 @@ public class Battlefield extends Frame {
 //						m2.eatclip.play();
 //					}
 //				}
-                if (p.life < 0) {
-                    if (p.bespecial)
-                        accessoryList.add(new Accessory(p.pX, p.pY, p.atype));
-                    explodeList.add(new Explode(p.pX, p.pY));
-                    p = null;
-                    pnums.remove();
-                    m2.explodeclip.play();
+
+            //判断是否撞击控制飞机
+            if (p.hit(Controlplane)){
+                p.life -= 80;
+                Controlplane.life -= (30-Controlplane.controller.baseDefense);
+                t1.setText(Controlplane.life + "");
+            }
+            if (mode.biperson && p.hit(Controlplane1)){
+                p.life -= 80;
+                Controlplane1.life -= (30-Controlplane1.controller.baseDefense);
+                t2.setText(Controlplane1.life + "");
+            }
+            if (p.life < 0) {
+                if (p.bespecial)
+                    accessoryList.add(new Accessory(p.pX, p.pY, p.atype));
+                explodeList.add(new Explode(p.pX, p.pY, explode));
+                p = null;
+                pnums.remove();
+                m2.explodeclip.play();
+                Controlplane.controller.score += 100;
+            }
+        }
+        //附件
+        if (hasAccessory) {
+            int temp;
+            if (mode.advance) {
+                temp = getRandomIntNum(1, 7);
+            } else {
+                temp = getRandomIntNum(1, 3);
+            }
+            switch (temp) {
+                case 1:
+                    accessoryList.add(new Accessory(boxs));
+                    break;
+                case 2:
+                    accessoryList.add(new Accessory(lives));
+                    break;
+                case 3:
+                    accessoryList.add(new Accessory(oil));
+                    break;
+                case 4:
+                    accessoryList.add(new Accessory(stoneleft));
+                    break;
+                case 5:
+                    accessoryList.add(new Accessory(stoneleft));
+                    break;
+                case 6:
+                    accessoryList.add(new Accessory(stoneright));
+                    break;
+                case 7:
+                    accessoryList.add(new Accessory(stoneright));
+                    break;
+                default:
+                    break;
+            }
+            hasAccessory = false;
+        }
+        Iterator<Accessory> anums = accessoryList.iterator();
+        while (anums.hasNext()) {
+            Accessory a = anums.next();
+            drawOffScreen.drawImage(a.atype.aImage, a.aX, a.aY, null);
+            if (mode.advance && a.atype.id == 8) {
+                if (a.atype.stoneDirect) {
+                    a.aX -= 1;
+                } else {
+                    a.aX += 1;
                 }
             }
-            //附件
-            if (hasAccessory) {
-                int temp;
-                if (mode.advance) {
-                    temp = getRandomIntNum(1, 7);
-                } else {
-                    temp = getRandomIntNum(1, 3);
-                }
-                switch (temp) {
+            a.aY += a.speed;
+            if (a.aY > 900) {
+                a = null;
+                anums.remove();
+                m2.beepclip.stop();
+                continue;
+            }
+            if (Controlplane.hit(a)) {
+                a = null;
+                t1.setText(Controlplane.life + "");
+                t3.setText(Controlplane.oil + "");
+                anums.remove();
+                m2.beepclip.stop();
+                m2.eatclip.play();
+                continue;
+            }
+            if (mode.biperson && Controlplane1.hit(a)) {
+                a = null;
+                anums.remove();
+                m2.beepclip.stop();
+                m2.eatclip.play();
+                t2.setText(Controlplane1.life + "");
+                t4.setText(Controlplane1.oil + "");
+                continue;
+            }
+        }
+        // 玩家发射子弹
+        if (fire) {
+            if (Controlplane.bullettype == playerBullet) {
+                bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 - 3, Controlplane.pY, 13, 13, Controlplane.bullettype, controller, 1));
+            } else if (Controlplane.bullettype == shotBullet) {
+                bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 - 3, Controlplane.pY, 13, 13, Controlplane.bullettype, 1, controller, 1));
+                bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 - 3, Controlplane.pY, 13, 13, Controlplane.bullettype, 2, controller, 1));
+                bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 - 3, Controlplane.pY, 13, 13, Controlplane.bullettype, 3, controller, 1));
+            } else if (Controlplane.bullettype == biBullet) {
+                bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 + 4, Controlplane.pY, 13, 13, Controlplane.bullettype, controller, 1));
+                bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 - 10, Controlplane.pY, 13, 13, Controlplane.bullettype, controller, 1));
+            }
+            fire = false;
+        }
+        if (mode.biperson && fire1) {
+            if (Controlplane1.bullettype == playerBullet) {
+                bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 - 3, Controlplane1.pY, 13, 13, Controlplane.bullettype, controller1, 2));
+            } else if (Controlplane1.bullettype == shotBullet) {
+                bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 - 3, Controlplane1.pY, 13, 13, Controlplane.bullettype, 1, controller1, 2));
+                bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 - 3, Controlplane1.pY, 13, 13, Controlplane.bullettype, 2, controller1, 2));
+                bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 - 3, Controlplane1.pY, 13, 13, Controlplane.bullettype, 3, controller1, 2));
+            } else if (Controlplane1.bullettype == biBullet) {
+                bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 + 4, Controlplane1.pY, 13, 13, Controlplane.bullettype, controller1, 2));
+                bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 - 10, Controlplane1.pY, 13, 13, Controlplane.bullettype, controller1, 2));
+            }
+            fire1 = false;
+        }
+        Iterator<Bullet> bnums = bulletsList.iterator();
+        while (bnums.hasNext()) {
+            Bullet b = bnums.next();
+            drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
+            b.bY -= b.speed;
+
+            // 敌机子弹斜射功能的基本实现
+            if (shotBullet.equals(b.bullettype)) {
+                switch (b.shotid) {
                     case 1:
-                        accessoryList.add(new Accessory(boxs));
-                        break;
-                    case 2:
-                        accessoryList.add(new Accessory(lives));
+                        b.bX -= b.xspeed;
                         break;
                     case 3:
-                        accessoryList.add(new Accessory(oil));
-                        break;
-                    case 4:
-                        accessoryList.add(new Accessory(stoneleft));
-                        break;
-                    case 5:
-                        accessoryList.add(new Accessory(stoneleft));
-                        break;
-                    case 6:
-                        accessoryList.add(new Accessory(stoneright));
-                        break;
-                    case 7:
-                        accessoryList.add(new Accessory(stoneright));
+                        b.bX += b.xspeed;
                         break;
                     default:
                         break;
                 }
-                hasAccessory = false;
+            } else if (nmlBullet_l.equals(b.bullettype)) {
+                b.bX -= b.xspeed;
+            } else if (nmlBullet_r.equals(b.bullettype)) {
+                b.bX += b.xspeed;
             }
-            Iterator<Accessory> anums = accessoryList.iterator();
-            while (anums.hasNext()) {
-                Accessory a = anums.next();
-                drawOffScreen.drawImage(a.atype.aImage, a.aX, a.aY, null);
-                if (mode.advance && a.atype.id == 8) {
-                    if (a.atype.stoneDirect) {
-                        a.aX -= 1;
-                    } else {
-                        a.aX += 1;
-                    }
-                }
-                a.aY += a.speed;
-                if (a.aY > 900) {
-                    a = null;
-                    anums.remove();
-                    m2.beepclip.stop();
-                    continue;
-                }
-                if (Controlplane.hit(a)) {
-                    a = null;
-                    t1.setText(Controlplane.life + "");
-                    anums.remove();
-                    m2.beepclip.stop();
-                    m2.eatclip.play();
-                    continue;
-//        			    t2.setText(Controlplane.life+"");
-                }
-                if (mode.biperson && Controlplane1.hit(a)) {
-                    a = null;
-                    anums.remove();
-                    m2.beepclip.stop();
-                    m2.eatclip.play();
-                    t2.setText(Controlplane1.life + "");
-                    continue;
-//        			    t2.setText(Controlplane.life+"");
-                }
-                //判断是否被击中?
-                Iterator<Bullet> bnums = bulletsList.iterator();
-                while (bnums.hasNext()) {
-                    Bullet b = bnums.next();
-                    if (a.hit(b)) {
-                        b = null;
-                        bnums.remove();
-                        m2.hitclip.play();
-                    }
-                }
-                if (a.life < 0) {
-                    explodeList.add(new Explode(a.aX, a.aY));
-                    a = null;
-                    m2.beepclip.stop();
-                    anums.remove();
-                    m2.explodeclip.play();
-                }
-            }
-            // 玩家发射子弹
-            if (fire) {
-                if (Controlplane.bullettype == playerBullet) {
-                    bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 - 3, Controlplane.pY, 13, 13, Controlplane.bullettype, controller, 1));
-                } else if (Controlplane.bullettype == shotBullet) {
-                    bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 - 3, Controlplane.pY, 13, 13, Controlplane.bullettype, 1, controller, 1));
-                    bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 - 3, Controlplane.pY, 13, 13, Controlplane.bullettype, 2, controller, 1));
-                    bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 - 3, Controlplane.pY, 13, 13, Controlplane.bullettype, 3, controller, 1));
-                } else if (Controlplane.bullettype == biBullet) {
-                    bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 + 4, Controlplane.pY, 13, 13, Controlplane.bullettype, controller, 1));
-                    bulletsList.add(new Bullet(Controlplane.pX + Controlplane.pWidth / 2 - 10, Controlplane.pY, 13, 13, Controlplane.bullettype, controller, 1));
-                }
-                fire = false;
-                //t1.setText(Controlplane.bulletnum+"");
-            }
-            if (mode.biperson && fire1) {
-                if (Controlplane1.bullettype == playerBullet) {
-                    bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 - 3, Controlplane1.pY, 13, 13, Controlplane.bullettype, controller1, 2));
-                } else if (Controlplane1.bullettype == shotBullet) {
-                    bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 - 3, Controlplane1.pY, 13, 13, Controlplane.bullettype, 1, controller1, 2));
-                    bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 - 3, Controlplane1.pY, 13, 13, Controlplane.bullettype, 2, controller1, 2));
-                    bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 - 3, Controlplane1.pY, 13, 13, Controlplane.bullettype, 3, controller1, 2));
-                } else if (Controlplane1.bullettype == biBullet) {
-                    bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 + 4, Controlplane1.pY, 13, 13, Controlplane.bullettype, controller1, 2));
-                    bulletsList.add(new Bullet(Controlplane1.pX + Controlplane1.pWidth / 2 - 10, Controlplane1.pY, 13, 13, Controlplane.bullettype, controller1, 2));
-                }
-                fire1 = false;
-                //t1.setText(Controlplane.bulletnum+"");
-            }
-            Iterator<Bullet> bnums = bulletsList.iterator();
-            while (bnums.hasNext()) {
-                Bullet b = bnums.next();
-                drawOffScreen.drawImage(b.bullettype.bimage, b.bX, b.bY, null);
-                b.bY -= b.speed;
 
-                // 敌机子弹斜射功能的基本实现
-                if (shotBullet.equals(b.bullettype)) {
-                    switch (b.shotid) {
+            // 超出场景范围后就删除
+            if ((b.bY < 0) || (b.bY > 900) || (b.bX < 0) || (b.bX > 1000)) {
+                b = null;
+                bnums.remove();
+                continue;
+            }
+            if ((Controlplane.hit(b))) {
+                b = null;
+                bnums.remove();
+                m2.hitclip.play();
+                t1.setText(Controlplane.life + "");
+                t3.setText(Controlplane.oil + "");
+                continue;
+            }
+            if (mode.biperson)
+                if (Controlplane1.hit(b)) {
+                    b = null;
+                    bnums.remove();
+                    m2.hitclip.play();
+                    t2.setText(Controlplane1.life + "");
+                    t4.setText(Controlplane1.oil + "");
+                }
+        }
+        if (gameover == 0) {
+            if (!Controlplane.controller.over)
+                // 就是根据等级换了个贴图？
+                if (mode.endless) {
+                    switch (Controlplane.controller.level) {
                         case 1:
-                            b.bX -= b.xspeed;
+                            myplane = myplaneL1;
+                            break;
+                        case 2:
+                            myplane = myplaneL2;
                             break;
                         case 3:
-                            b.bX += b.xspeed;
+                            myplane = myplaneL3;
                             break;
                         default:
                             break;
                     }
-                } else if (nmlBullet_l.equals(b.bullettype)) {
-                    b.bX -= b.xspeed;
-                } else if (nmlBullet_r.equals(b.bullettype)) {
-                    b.bX += b.xspeed;
                 }
+            drawOffScreen.drawImage(myplane, Controlplane.pX, Controlplane.pY, null);
+            if (mode.biperson)
+                if (Controlplane1.controller.over == false)
+                    drawOffScreen.drawImage(myplane1, Controlplane1.pX, Controlplane1.pY, null);
+        }
+        if (gameover == -1) drawOffScreen.drawImage(gameoverimage, 450, 300, null);
+        if (gameover == 1) drawOffScreen.drawImage(winimage, 450, 300, null);
 
-                // 超出场景范围后就删除
-                if ((b.bY < 0) || (b.bY > 900) || (b.bX < 0) || (b.bX > 1000)) {
-                    b = null;
-                    bnums.remove();
-                    continue;
-                }
-                if ((Controlplane.hit(b))) {
-                    b = null;
-                    bnums.remove();
-                    m2.hitclip.play();
-                    // 屏幕闪红或抖动
-//                    drawOffScreen.drawImage(background_red, 0, 0, 1000, 900, 0, (int) backy, 360, 320 + (int) backy, null);
+        //判断是否被击中?
+        if ((Controlplane.life < 0) || (Controlplane.oil < 0)) {
+            if (flag1 == false)
+                explodeList.add(new Explode(Controlplane.pX, Controlplane.pY, explode));
+            flag1 = true;
+            Controlplane.life = 0;
+            Controlplane.oil = 0;
+            Controlplane.controller.over = true;
+            m2.explodeclip.play();
+        }
 
-                    t1.setText(Controlplane.life + "");
-
-                    t3.setText(Controlplane.oil + "");
-                    continue;
-                }
-                ;
-                if (mode.biperson)
-                    if (Controlplane1.hit(b)) {
-                        b = null;
-                        bnums.remove();
-                        m2.hitclip.play();
-                        t2.setText(Controlplane1.life + "");
-                        t4.setText(Controlplane1.oil + "");
-                        //  t2.setText(Controlplane.life+"");
-                        //t3.setText(Controlplane.oil+"");
-                    }
-                ;
-            }
-            if (gameover == 0) {
-                if (!Controlplane.controller.over)
-                    if (mode.endless) {
-                        switch (Controlplane.controller.level) {
-                            case 1:
-                                myplane = myplaneL1;
-                                break;
-                            case 2:
-                                myplane = myplaneL2;
-                                break;
-                            case 3:
-                                myplane = myplaneL3;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                drawOffScreen.drawImage(myplane, Controlplane.pX, Controlplane.pY, null);
-                if (mode.biperson)
-                    if (Controlplane1.controller.over == false)
-                        drawOffScreen.drawImage(myplane1, Controlplane1.pX, Controlplane1.pY, null);
-            }
-            if (gameover == -1) drawOffScreen.drawImage(gameoverimage, 450, 300, null);
-            if (gameover == 1) drawOffScreen.drawImage(winimage, 450, 300, null);
-
-            //判断是否被击中?
-            if ((Controlplane.life < 0) || (Controlplane.oil < 0)) {
-                if (flag1 == false)
-                    explodeList.add(new Explode(Controlplane.pX, Controlplane.pY));
-                flag1 = true;
-                Controlplane.life = 0;
-                Controlplane.oil = 0;
-                Controlplane.controller.over = true;
+        if (mode.biperson) {
+            if ((Controlplane1.life < 0) || (Controlplane1.oil < 0)) {
+                if (!flag2)
+                    explodeList.add(new Explode(Controlplane1.pX, Controlplane1.pY, explode));
+                flag2 = true;
+                Controlplane1.life = 0;
+                Controlplane1.oil = 0;
+                Controlplane1.controller.over = true;
                 m2.explodeclip.play();
             }
-
-            if (mode.biperson) {
-                if ((Controlplane1.life < 0) || (Controlplane1.oil < 0)) {
-                    if (!flag2)
-                        explodeList.add(new Explode(Controlplane1.pX, Controlplane1.pY));
-                    flag2 = true;
-                    Controlplane1.life = 0;
-                    Controlplane1.oil = 0;
-                    Controlplane1.controller.over = true;
-                    m2.explodeclip.play();
-                }
-                ;
-                if ((Controlplane.controller.over) && (Controlplane1.controller.over)) {
-                    gameover = -1;
-                }
-            } else if ((Controlplane.controller.over)) {
+            ;
+            if ((Controlplane.controller.over) && (Controlplane1.controller.over)) {
                 gameover = -1;
-
             }
+        } else if ((Controlplane.controller.over)) {
+            gameover = -1;
+        }
 //判断是否胜利?
-            if (planeList.size() == 0) gameover = 1;
+        if (planeList.size() == 0) gameover = 1;
 
-            if ((explodeList.size() == 0) && (gameover != 0)) {
-                goon = false;
-            }
+        if ((explodeList.size() == 0) && (gameover != 0)) {
+            goon = false;
+        }
 
-            Iterator<Explode> enums = explodeList.iterator();
-            while (enums.hasNext()) {
-                Explode e = enums.next();
-                drawOffScreen.drawImage(e.eimage, e.eX, e.eY, null);
-                e.life--;
+        Iterator<Explode> enums = explodeList.iterator();
+        while (enums.hasNext()) {
+            Explode e = enums.next();
+            drawOffScreen.drawImage(e.eimage, e.eX, e.eY, null);
+            e.life--;
 
-                if (e.life < 0) {
-                    e = null;
-                    enums.remove();
-                }
-                ;
-            }
-            //g.drawImage(OffScreen1,0,0,this.p2);
-
-            //更新位置
-            if (!Controlplane.controller.over && locationreflesh) {
-                if (!mode.biperson) locationreflesh = false;
-                if (controlflag[0])
-                    Controlplane.pX += Controlplane.speed + Controlplane.controller.speedincrement;
-                if (controlflag[1])
-                    Controlplane.pX -= Controlplane.speed + Controlplane.controller.speedincrement;
-                if (controlflag[2])
-                    Controlplane.pY -= Controlplane.speed + Controlplane.controller.speedincrement;
-                if (controlflag[3])
-                    Controlplane.pY += Controlplane.speed + Controlplane.controller.speedincrement;
-                if (Controlplane.pX>1000)
-                    Controlplane.pX -= 1000;
-                if (Controlplane.pX<-30)
-                    Controlplane.pX += 1000;
-                if (Controlplane.pY>850)
-                    Controlplane.pY = 850;
-                if (Controlplane.pY<0)
-                    Controlplane.pY = 0;
-            }
-
-            if (mode.biperson && (!Controlplane1.controller.over) && locationreflesh) {
-                locationreflesh = false;
-                if (controlflag1[0])
-                    Controlplane1.pX += Controlplane1.speed + Controlplane1.controller.speedincrement;
-                if (controlflag1[1])
-                    Controlplane1.pX -= Controlplane1.speed + Controlplane1.controller.speedincrement;
-                if (controlflag1[2])
-                    Controlplane1.pY -= Controlplane1.speed + Controlplane1.controller.speedincrement;
-                if (controlflag1[3])
-                    Controlplane1.pY += Controlplane1.speed + Controlplane1.controller.speedincrement;
+            if (e.life < 0) {
+                e = null;
+                enums.remove();
             }
         }
+        //g.drawImage(OffScreen1,0,0,this.p2);
+
+        //更新位置
+        if (!Controlplane.controller.over && locationreflesh) {
+            if (!mode.biperson) locationreflesh = false;
+            if (controlflag[0])
+                Controlplane.pX += Controlplane.speed + Controlplane.controller.speedincrement;
+            if (controlflag[1])
+                Controlplane.pX -= Controlplane.speed + Controlplane.controller.speedincrement;
+            if (controlflag[2])
+                Controlplane.pY -= Controlplane.speed + Controlplane.controller.speedincrement;
+            if (controlflag[3])
+                Controlplane.pY += Controlplane.speed + Controlplane.controller.speedincrement;
+            if (Controlplane.pX > 1000)
+                Controlplane.pX -= 1000;
+            if (Controlplane.pX < -30)
+                Controlplane.pX += 1000;
+            if (Controlplane.pY > 850)
+                Controlplane.pY = 850;
+            if (Controlplane.pY < 0)
+                Controlplane.pY = 0;
+        }
+
+        if (mode.biperson && (!Controlplane1.controller.over) && locationreflesh) {
+            locationreflesh = false;
+            if (controlflag1[0])
+                Controlplane1.pX += Controlplane1.speed + Controlplane1.controller.speedincrement;
+            if (controlflag1[1])
+                Controlplane1.pX -= Controlplane1.speed + Controlplane1.controller.speedincrement;
+            if (controlflag1[2])
+                Controlplane1.pY -= Controlplane1.speed + Controlplane1.controller.speedincrement;
+            if (controlflag1[3])
+                Controlplane1.pY += Controlplane1.speed + Controlplane1.controller.speedincrement;
+        }
+//        System.gc();
     }
 
     /**
@@ -893,14 +890,17 @@ public class Battlefield extends Frame {
                 p1.add(new Label("Oil"), 2);
                 t3 = new TextField(3);
                 p1.add(t3, 3);
+                p1.add(new Label("Score"), 4);
+                t4 = new TextField(3);
+                p1.add(t4, 5);
                 start = new Button("Start");
-                p1.add(start, 4);
+                p1.add(start, 6);
                 start.addActionListener(new Startaction());
                 save = new Button("Save");
-                p1.add(save, 5);
+                p1.add(save, 7);
                 save.addActionListener(new Saveaction());
                 load = new Button("Load");
-                p1.add(load, 6);
+                p1.add(load, 8);
             }
 
         }
@@ -924,21 +924,40 @@ public class Battlefield extends Frame {
     }
 
     public static void main(String[] args) {
+        final int[] Difficulty_in = {2};
+        final int[] planeSelect_in = {1};
 
         JFrame fs = new JFrame("模式选择");
         fs.setSize(1000, 1000);
         //fs.setLocation(580, 240);
-        fs.setLayout(null);
+        fs.setLayout(new GridLayout(4, 1));
         JButton b1 = new JButton("单人模式");
         b1.setBounds(100, 100, 150, 50);
+        b1.setIcon(new ImageIcon("Backgrounds/icon/person_fill.png"));
+        b1.setRolloverIcon(new ImageIcon("Backgrounds/icon/person_fill_d.png"));
         JButton b2 = new JButton("双人模式");
         b2.setBounds(300, 100, 150, 50);
+        b2.setIcon(new ImageIcon("Backgrounds/icon/person_2_fill.png"));
+        b2.setRolloverIcon(new ImageIcon("Backgrounds/icon/person_2_fill_d.png"));
         JButton b3 = new JButton("无限模式");
         b3.setBounds(500, 100, 150, 50);
-        JButton b4 = new JButton("闯关模式");
+        b3.setIcon(new ImageIcon("Backgrounds/icon/airplaneblackshapefromtopview.png"));
+        b3.setRolloverIcon(new ImageIcon("Backgrounds/icon/airplaneblackshapefromtopview_d.png"));
+        JButton b4 = new JButton("游戏设置");
         b4.setBounds(700, 100, 150, 50);
-        //JRadioButton b4 = new JRadioButton("xx模式");
-        //b4.setBounds(100, 700, 200, 50);
+        b4.setIcon(new ImageIcon("Backgrounds/icon/Settingscontroloptions.png"));
+        b4.setRolloverIcon(new ImageIcon("Backgrounds/icon/Settingscontroloptions_d.png"));
+
+        b1.setFont(new Font("黑体",Font.BOLD,40));
+        b2.setFont(new Font("黑体",Font.BOLD,40));
+        b3.setFont(new Font("黑体",Font.BOLD,40));
+        b4.setFont(new Font("黑体",Font.BOLD,40));
+        b1.setBackground(new Color(0xFF,0xFF,0xCC));
+        b2.setBackground(new Color(0xCC,0xFF,0xFF));
+        b3.setBackground(new Color(0xFF,0xCC,0xCC));
+        b4.setBackground(new Color(0x99,0xCC,0xFF));
+
+
 
         fs.add(b1);
         fs.add(b2);
@@ -948,7 +967,7 @@ public class Battlefield extends Frame {
         b1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fieldmode mode = new fieldmode(0, 1);
+                fieldmode mode = new fieldmode(0, Difficulty_in[0], planeSelect_in[0]);
                 Battlefield f = new Battlefield(mode);
                 f.addWindowListener(new WindowAdapter() {
                     public void windowClosing(WindowEvent e) {
@@ -966,7 +985,7 @@ public class Battlefield extends Frame {
         b2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fieldmode mode = new fieldmode(1, 1);
+                fieldmode mode = new fieldmode(1,  Difficulty_in[0], planeSelect_in[0]);
                 Battlefield f = new Battlefield(mode);
                 f.addWindowListener(new WindowAdapter() {
                     public void windowClosing(WindowEvent e) {
@@ -985,7 +1004,7 @@ public class Battlefield extends Frame {
         b3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fieldmode mode = new fieldmode(2, 1);
+                fieldmode mode = new fieldmode(2, Difficulty_in[0], planeSelect_in[0]);
                 Battlefield f = new Battlefield(mode);
                 f.addWindowListener(new WindowAdapter() {
                     public void windowClosing(WindowEvent e) {
@@ -1005,21 +1024,110 @@ public class Battlefield extends Frame {
         b4.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fieldmode mode = new fieldmode(3, 1);
-                Battlefield f = new Battlefield(mode);
-                f.addWindowListener(new WindowAdapter() {
+                JFrame frame=new JFrame("游戏设置");    //创建Frame窗口
+                JPanel panel=new JPanel();    //创建面板
+                JLabel label1=new JLabel("选择难度：");
+                JRadioButton rb1=new JRadioButton("简单");    //创建JRadioButton对象
+                JRadioButton rb2=new JRadioButton("普通");    //创建JRadioButton对象
+                JRadioButton rb3=new JRadioButton("困难");    //创建JRadioButton对象
+                JRadioButton rb4=new JRadioButton("地狱");    //创建JRadioButton对象
+                ButtonGroup group=new ButtonGroup();
+                //添加JRadioButton到ButtonGroup中
+                switch (Difficulty_in[0]){
+                    case 1:
+                        rb1.setSelected(true);
+                    case 2:
+                        rb2.setSelected(true);
+                    case 3:
+                        rb3.setSelected(true);
+                    case 4:
+                        rb4.setSelected(true);
+                }
+                group.add(rb1);
+                group.add(rb2);
+                group.add(rb3);
+                group.add(rb4);
+                panel.add(label1);
+                panel.add(rb1);
+                panel.add(rb2);
+                panel.add(rb3);
+                panel.add(rb4);
+
+                JPanel panel2=new JPanel();
+                JLabel label2=new JLabel("选择机型：");
+                JRadioButton rb5=new JRadioButton("单发");    //创建JRadioButton对象
+                JRadioButton rb6=new JRadioButton("双发");    //创建JRadioButton对象
+                ButtonGroup group2 = new ButtonGroup();
+                switch (planeSelect_in[0]){
+                    case 1:
+                        rb5.setSelected(true);
+                    case 2:
+                        rb6.setSelected(true);
+                }
+
+                //添加JRadioButton到ButtonGroup中
+                group2.add(rb5);
+                group2.add(rb6);
+                panel2.add(label2);
+                panel2.add(rb5);
+                panel2.add(rb6);
+
+                JButton confirm = new JButton("确定");
+                JButton cancel = new JButton("取消");
+                JPanel panel3 = new JPanel();
+                panel3.add(confirm);
+                panel3.add(cancel);
+
+                frame.add(panel,BorderLayout.NORTH);
+                frame.add(panel2,BorderLayout.CENTER);
+                frame.add(panel3,BorderLayout.SOUTH);
+
+                label1.setFont(new Font("黑体",Font.BOLD,24));    //修改字体样式
+                label2.setFont(new Font("黑体",Font.BOLD,24));
+                rb1.setFont(new Font("黑体",Font.BOLD,24));
+                rb2.setFont(new Font("黑体",Font.BOLD,24));
+                rb3.setFont(new Font("黑体",Font.BOLD,24));
+                rb4.setFont(new Font("黑体",Font.BOLD,24));
+                rb5.setFont(new Font("黑体",Font.BOLD,24));
+                rb6.setFont(new Font("黑体",Font.BOLD,24));
+
+                frame.setBounds(250, 600, 500, 200);
+                frame.setVisible(true);
+                frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                frame.addWindowListener(new WindowAdapter() {
+                    @Override
                     public void windowClosing(WindowEvent e) {
-                        System.exit(0);
+                        frame.dispose();
                     }
                 });
-                //f.showPrologue(drawOffScreen1);
-                f.showcomponent();
-                f.setSize(1000, 1000);
-                f.setVisible(true);
-                fs.dispose();
-                f.gameperpare();
-                f.gameUnlimit();
-                //f.gamebegin();
+                confirm.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // 设置难度
+                        if(rb1.isSelected())
+                            Difficulty_in[0] = 1;
+                        else if(rb2.isSelected())
+                            Difficulty_in[0] = 2;
+                        else if(rb3.isSelected())
+                            Difficulty_in[0] = 3;
+                        else if(rb4.isSelected())
+                            Difficulty_in[0] = 4;
+                        // 设置机型贴图(子弹贴图、子弹类型)
+                        if(rb5.isSelected())
+                            planeSelect_in[0] = 1;
+                        else if(rb6.isSelected())
+                            planeSelect_in[0] = 2;
+
+                        frame.dispose();
+                    }
+                });
+                cancel.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        frame.dispose();
+                    }
+                });
+
             }
         });
         fs.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -1136,7 +1244,7 @@ public class Battlefield extends Frame {
                 @SuppressWarnings("deprecation")
                 public void run() {
                     hasAccessory = true;
-                    m2.beepclip.loop();
+//                    m2.beepclip.loop();
                 }
             };
             timer = new Timer();
@@ -1144,16 +1252,17 @@ public class Battlefield extends Frame {
 
             TimerTask task2 = new TimerTask() {
                 public void run() {
-                    Controlplane.oil -= 5;
+                    Controlplane.oil -= 1;
                     t3.setText(Controlplane.oil + "");
+                    t4.setText(Controlplane.controller.score + Controlplane.life + Controlplane.oil + "");
                     if (mode.biperson) {
-                        Controlplane1.oil -= 5;
+                        Controlplane1.oil -= 1;
                         t4.setText(Controlplane1.oil + "");
                     }
                 }
             };
             timer2 = new Timer();
-            timer2.schedule(task2, 3000, 3000);
+            timer2.schedule(task2, 3000, 600);
             TimerTask task3 = new TimerTask() {
                 public void run() {
                     addplane = true;
@@ -1215,10 +1324,8 @@ public class Battlefield extends Frame {
                 beepclip = Applet.newAudioClip(beep.toURL());
                 hitclip = Applet.newAudioClip(hit.toURL());
                 eatclip = Applet.newAudioClip(eat.toURL());
-
             } catch (Exception e) {
             }
-            ;
         }
 /*	public void run() {
 	  while (true) {
