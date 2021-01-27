@@ -6,8 +6,9 @@ public class fieldmode implements Serializable {
     boolean endless;//无尽模式
     boolean advance;//闯关模式
     int degree;//难度
+    int planeSelect;
 
-    public fieldmode(int id_in, int difficulty) {
+    public fieldmode(int id_in, int difficulty, int select) {
         biperson = false;
         endless = false;
         advance = false;
@@ -25,6 +26,7 @@ public class fieldmode implements Serializable {
                 break;
         }
         degree = difficulty;
+        planeSelect = select;
     }
 
 }
