@@ -28,7 +28,6 @@ public class Accessory implements Serializable {
         aWidth = 32;
         aHeight = 32;
         atype = atype_in;
-
     }
 
     public boolean hit(Bullet b) {
