@@ -107,12 +107,12 @@ public class Airplane implements Serializable {
     public boolean hit(Airplane p) {
         if ((pX - pWidth < p.pX) && (p.pX < pX + pWidth) && (pY < p.pY) && (p.pY < pY + pHeight)) {
             if (controlled && p.controlled) return true;
-            if (controlled) {
-                if (120 > controller.baseDefense) {
-                    life = life - 120 + controller.baseDefense;
-                    p.life -= 120;
-                }
-            }
+//            if (controlled) {
+//                if (120 > controller.baseDefense) {
+//                    life = life - 120 + controller.baseDefense;
+//                    p.life -= 120;
+//                }
+//            }
             return true;
         } else return false;
     }
@@ -124,15 +124,7 @@ public class Airplane implements Serializable {
                     bullettype = a.atype.btype;
                 }
                 if (a.atype.id == 6) {
-                    controller.tempDefense = controller.baseDefense;
-                    controller.baseDefense = 9999;
-                    java.util.Timer timer = new java.util.Timer(true);
-                    TimerTask task = new TimerTask() {
-                        public void run() {
-                            controller.baseDefense = controller.tempDefense;
-                        }
-                    };
-                    timer.schedule(task, 3000);
+
                 }
                 if (a.atype.id == 7) {
                     controller.speedincrement = 5;

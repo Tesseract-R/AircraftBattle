@@ -76,7 +76,7 @@ public class Battlefield extends Frame {
     fieldmode mode;
     Image OffScreen1, OffScreen2, O2;
     Graphics2D drawOffScreen1, drawOffScreen2, g;
-    Image myplane, myplane1,myplane2, eplane1, eplane2, bullet, bullet_p, bullet_l, bullet_r, explode, backgroud, background_red, a1, a2, a3, a4, gameoverimage, winimage, myplaneL1, myplaneL2, myplaneL3;
+    Image myplane, myplane1, myplane2, eplane1, eplane2, bullet, bullet_p, bullet_l, bullet_r, shieldImg, explode, backgroud, background_red, a1, a2, a3, a4, a5, a6, gameoverimage, winimage, myplaneL1, myplaneL2, myplaneL3;
     int key;
     boolean flag1, flag2;
     boolean controlflag[] = new boolean[5];
@@ -85,12 +85,14 @@ public class Battlefield extends Frame {
     Airplane Controlplane, Controlplane1;
     ControlplaneAdvance controller, controller1;//飞机控制相关
     Bullettype playerBullet, nmlBullet, nmlBullet_l, nmlBullet_r, shotBullet, biBullet;//普通子弹 散弹 双列子弹
-    Accessorytype lives, boxs, oil, bibox, shotbox, shield, smasher, stoneleft, stoneright;
+    Shieldtype shieldtype; // 普通护盾
+    Accessorytype lives, boxs, oil, bibox, shotbox, shieldbox, smasher, stoneleft, stoneright;
     //道具类型:生命，箱子，油罐，双排子弹箱，散弹箱，盾牌，加速器
     ArrayList<Bullet> bulletsList;
     ArrayList<Airplane> planeList;
     ArrayList<Explode> explodeList;
     ArrayList<Accessory> accessoryList;
+    ArrayList<Shield> shieldList;
     TextField t1, t2, t3, t4, t5, t6;
     Panel p1, p2;
     Button start, save, load;
@@ -139,11 +141,10 @@ public class Battlefield extends Frame {
         Difficulty = mode.degree;
         planeSelect = mode.planeSelect;
         flag = new Flag();
-        if(planeSelect==1){
+        if (planeSelect == 1) {
             myplane = getToolkit().getImage("Airplanes/airplane3.gif");
             bullet_p = getToolkit().getImage("Bullets/Bullet11p.gif");
-        }
-        else if(planeSelect==2){
+        } else if (planeSelect == 2) {
             myplane = getToolkit().getImage("Airplanes/airplane17.gif");
             bullet_p = getToolkit().getImage("Bullets/Bullet12p.gif");
         }
@@ -162,6 +163,9 @@ public class Battlefield extends Frame {
         a2 = getToolkit().getImage("accessory/box1.gif");
         a3 = getToolkit().getImage("accessory/oil.gif");
         a4 = getToolkit().getImage("accessory/stone.gif");
+        a5 = getToolkit().getImage("accessory/box2.gif");
+        a6 = getToolkit().getImage("accessory/box3.gif");
+        shieldImg = getToolkit().getImage("accessory/shield.gif");
 
         Airplane.eplane1 = eplane1;
         Airplane.eplane2 = eplane2;
@@ -178,43 +182,44 @@ public class Battlefield extends Frame {
         bulletsList = new ArrayList<Bullet>();
         explodeList = new ArrayList<Explode>();
         accessoryList = new ArrayList<Accessory>();
+        shieldList = new ArrayList<Shield>();
     }
 
     public void gameperpare() {
         controller = new ControlplaneAdvance();
         playerBullet = new Bullettype(20, "player", bullet_p);
-        nmlBullet = new Bullettype(Difficulty*4+12, "computer", bullet);  // 敌机发出的子弹
-        nmlBullet_l = new Bullettype(Difficulty*4+12, "computer", bullet_l);
-        nmlBullet_r = new Bullettype(Difficulty*4+12, "computer", bullet_r);
+        nmlBullet = new Bullettype(Difficulty * 4 + 12, "computer", bullet);  // 敌机发出的子弹
+        nmlBullet_l = new Bullettype(Difficulty * 4 + 12, "computer", bullet_l);
+        nmlBullet_r = new Bullettype(Difficulty * 4 + 12, "computer", bullet_r);
         shotBullet = new Bullettype(20, "player", bullet_p);
         biBullet = new Bullettype(2, "player", bullet_p);
+        shieldtype = new Shieldtype(1, shieldImg);
         lives = new Accessorytype(1, a1);
         boxs = new Accessorytype(2, a2);
         oil = new Accessorytype(3, a3);
         bibox = new Accessorytype(4, a2, biBullet);
-        shotbox = new Accessorytype(5, a2, shotBullet);
-        shield = new Accessorytype(6, a2);   // 待填充
+        shotbox = new Accessorytype(5, a5, shotBullet);
+        shieldbox = new Accessorytype(6, a6, shieldtype);
         smasher = new Accessorytype(7, a2);    // 待填充
         stoneleft = new Accessorytype(8, a4, true);
         stoneright = new Accessorytype(8, a4, false);
 
         if (mode.biperson) {
-            if(planeSelect==1) {
+            if (planeSelect == 1) {
                 controller1 = new ControlplaneAdvance();
                 Controlplane1 = new Airplane(700, 500, 80, 66, playerBullet, controller1);
                 Controlplane1.speed = 10;
                 Controlplane = new Airplane(300, 500, 80, 66, playerBullet, controller);
-            }
-            else if(planeSelect==2){
+            } else if (planeSelect == 2) {
                 controller1 = new ControlplaneAdvance();
                 Controlplane1 = new Airplane(700, 500, 80, 66, biBullet, controller1);
                 Controlplane1.speed = 10;
                 Controlplane = new Airplane(300, 500, 80, 66, biBullet, controller);
             }
         } else {
-            if(planeSelect==1)
+            if (planeSelect == 1)
                 Controlplane = new Airplane(500, 500, 80, 66, playerBullet, controller);
-            else if(planeSelect==2)
+            else if (planeSelect == 2)
                 Controlplane = new Airplane(500, 500, 80, 66, biBullet, controller);
         }
 
@@ -366,7 +371,7 @@ public class Battlefield extends Frame {
                             planeList.add(new Airplane(nmlBullet, shotbox));
                             break;
                         case 7:
-                            planeList.add(new Airplane(nmlBullet, shield));
+                            planeList.add(new Airplane(nmlBullet, shieldbox));
                             break;
                         case 8:
                             planeList.add(new Airplane(nmlBullet, smasher));
@@ -389,7 +394,7 @@ public class Battlefield extends Frame {
             if (p.eplane == 2) drawOffScreen.drawImage(Airplane.eplane2, p.pX, p.pY, null);
 
             //敌机发射子弹
-            if ((p.getRandomIntNum(0, (7-Difficulty)*100)) == 2) {
+            if ((p.getRandomIntNum(0, (7 - Difficulty) * 100)) == 2) {
                 if (p.bullettype == nmlBullet) {
                     int shot_id = getRandomIntNum(1, 4);
                     switch (shot_id) {
@@ -431,28 +436,17 @@ public class Battlefield extends Frame {
                 }
             }
 
-//				//判断附件状态
-//				Iterator<Accessory> anums =accessoryList.iterator();
-//				while(anums.hasNext()) {
-//					Accessory a = anums.next();
-//					if (p.hit(a) & p.controlled){
-//						t1.setText(Controlplane.life+"");
-//						a=null;
-//						anums.remove();
-//						m2.beepclip.stop();
-//						m2.eatclip.play();
-//					}
-//				}
-
             //判断是否撞击控制飞机
-            if (p.hit(Controlplane)){
-                p.life -= 80;
-                Controlplane.life -= (30-Controlplane.controller.baseDefense);
+            if (p.hit(Controlplane)) {
+                p.life -= 120;
+                if (Controlplane.controller.baseDefense<30)
+                    Controlplane.life -= (30 - Controlplane.controller.baseDefense);
                 t1.setText(Controlplane.life + "");
             }
-            if (mode.biperson && p.hit(Controlplane1)){
-                p.life -= 80;
-                Controlplane1.life -= (30-Controlplane1.controller.baseDefense);
+            if (mode.biperson && p.hit(Controlplane1)) {
+                p.life -= 120;
+                if (Controlplane1.controller.baseDefense<30)
+                    Controlplane1.life -= (30 - Controlplane1.controller.baseDefense);
                 t2.setText(Controlplane1.life + "");
             }
             if (p.life < 0) {
@@ -465,14 +459,9 @@ public class Battlefield extends Frame {
                 Controlplane.controller.score += 100;
             }
         }
-        //附件
+        // 生成附件
         if (hasAccessory) {
-            int temp;
-            if (mode.advance) {
-                temp = getRandomIntNum(1, 7);
-            } else {
-                temp = getRandomIntNum(1, 3);
-            }
+            int temp = getRandomIntNum(1, 4);
             switch (temp) {
                 case 1:
                     accessoryList.add(new Accessory(boxs));
@@ -484,16 +473,7 @@ public class Battlefield extends Frame {
                     accessoryList.add(new Accessory(oil));
                     break;
                 case 4:
-                    accessoryList.add(new Accessory(stoneleft));
-                    break;
-                case 5:
-                    accessoryList.add(new Accessory(stoneleft));
-                    break;
-                case 6:
-                    accessoryList.add(new Accessory(stoneright));
-                    break;
-                case 7:
-                    accessoryList.add(new Accessory(stoneright));
+                    accessoryList.add(new Accessory(shieldbox));
                     break;
                 default:
                     break;
@@ -504,13 +484,6 @@ public class Battlefield extends Frame {
         while (anums.hasNext()) {
             Accessory a = anums.next();
             drawOffScreen.drawImage(a.atype.aImage, a.aX, a.aY, null);
-            if (mode.advance && a.atype.id == 8) {
-                if (a.atype.stoneDirect) {
-                    a.aX -= 1;
-                } else {
-                    a.aX += 1;
-                }
-            }
             a.aY += a.speed;
             if (a.aY > 900) {
                 a = null;
@@ -519,6 +492,9 @@ public class Battlefield extends Frame {
                 continue;
             }
             if (Controlplane.hit(a)) {
+                if (a.atype.id==6){
+                    shieldList.add(new Shield(Controlplane,a.atype.Shieldtype));
+                }
                 a = null;
                 t1.setText(Controlplane.life + "");
                 t3.setText(Controlplane.oil + "");
@@ -530,6 +506,9 @@ public class Battlefield extends Frame {
             if (mode.biperson && Controlplane1.hit(a)) {
                 a = null;
                 anums.remove();
+                if (a.atype.id==6){
+                    shieldList.add(new Shield(Controlplane1,a.atype.Shieldtype));
+                }
                 m2.beepclip.stop();
                 m2.eatclip.play();
                 t2.setText(Controlplane1.life + "");
@@ -537,6 +516,30 @@ public class Battlefield extends Frame {
                 continue;
             }
         }
+
+        Iterator<Shield> snums = shieldList.iterator();
+        while (snums.hasNext()) {
+            Shield s = snums.next();
+            s.sX = Controlplane.pX;
+            s.sY = Controlplane.pY-s.sHeight;
+            drawOffScreen.drawImage(s.stype.sImage, s.sX, s.sY, null);
+
+            Iterator<Bullet> bnums = bulletsList.iterator();
+            while (bnums.hasNext()) {
+                Bullet b = bnums.next();
+                if (s.hit(b) & b.bullettype.bulletFrom.equals("computer")) {
+                    b = null;
+                    bnums.remove();
+                }
+            }
+            if (s.life < 0) {
+                explodeList.add(new Explode(s.sX, s.sY, explode));
+                s = null;
+                snums.remove();
+                m2.explodeclip.play();
+            }
+        }
+
         // 玩家发射子弹
         if (fire) {
             if (Controlplane.bullettype == playerBullet) {
@@ -716,6 +719,14 @@ public class Battlefield extends Frame {
                 Controlplane1.pY -= Controlplane1.speed + Controlplane1.controller.speedincrement;
             if (controlflag1[3])
                 Controlplane1.pY += Controlplane1.speed + Controlplane1.controller.speedincrement;
+            if (Controlplane1.pX > 1000)
+                Controlplane1.pX -= 1000;
+            if (Controlplane1.pX < -30)
+                Controlplane1.pX += 1000;
+            if (Controlplane1.pY > 850)
+                Controlplane1.pY = 850;
+            if (Controlplane1.pY < 0)
+                Controlplane1.pY = 0;
         }
 //        System.gc();
     }
@@ -948,15 +959,14 @@ public class Battlefield extends Frame {
         b4.setIcon(new ImageIcon("Backgrounds/icon/Settingscontroloptions.png"));
         b4.setRolloverIcon(new ImageIcon("Backgrounds/icon/Settingscontroloptions_d.png"));
 
-        b1.setFont(new Font("黑体",Font.BOLD,40));
-        b2.setFont(new Font("黑体",Font.BOLD,40));
-        b3.setFont(new Font("黑体",Font.BOLD,40));
-        b4.setFont(new Font("黑体",Font.BOLD,40));
-        b1.setBackground(new Color(0xFF,0xFF,0xCC));
-        b2.setBackground(new Color(0xCC,0xFF,0xFF));
-        b3.setBackground(new Color(0xFF,0xCC,0xCC));
-        b4.setBackground(new Color(0x99,0xCC,0xFF));
-
+        b1.setFont(new Font("黑体", Font.BOLD, 40));
+        b2.setFont(new Font("黑体", Font.BOLD, 40));
+        b3.setFont(new Font("黑体", Font.BOLD, 40));
+        b4.setFont(new Font("黑体", Font.BOLD, 40));
+        b1.setBackground(new Color(0xFF, 0xFF, 0xCC));
+        b2.setBackground(new Color(0xCC, 0xFF, 0xFF));
+        b3.setBackground(new Color(0xFF, 0xCC, 0xCC));
+        b4.setBackground(new Color(0x99, 0xCC, 0xFF));
 
 
         fs.add(b1);
@@ -985,7 +995,7 @@ public class Battlefield extends Frame {
         b2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fieldmode mode = new fieldmode(1,  Difficulty_in[0], planeSelect_in[0]);
+                fieldmode mode = new fieldmode(1, Difficulty_in[0], planeSelect_in[0]);
                 Battlefield f = new Battlefield(mode);
                 f.addWindowListener(new WindowAdapter() {
                     public void windowClosing(WindowEvent e) {
@@ -1024,16 +1034,16 @@ public class Battlefield extends Frame {
         b4.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFrame frame=new JFrame("游戏设置");    //创建Frame窗口
-                JPanel panel=new JPanel();    //创建面板
-                JLabel label1=new JLabel("选择难度：");
-                JRadioButton rb1=new JRadioButton("简单");    //创建JRadioButton对象
-                JRadioButton rb2=new JRadioButton("普通");    //创建JRadioButton对象
-                JRadioButton rb3=new JRadioButton("困难");    //创建JRadioButton对象
-                JRadioButton rb4=new JRadioButton("地狱");    //创建JRadioButton对象
-                ButtonGroup group=new ButtonGroup();
+                JFrame frame = new JFrame("游戏设置");    //创建Frame窗口
+                JPanel panel = new JPanel();    //创建面板
+                JLabel label1 = new JLabel("选择难度：");
+                JRadioButton rb1 = new JRadioButton("简单");    //创建JRadioButton对象
+                JRadioButton rb2 = new JRadioButton("普通");    //创建JRadioButton对象
+                JRadioButton rb3 = new JRadioButton("困难");    //创建JRadioButton对象
+                JRadioButton rb4 = new JRadioButton("地狱");    //创建JRadioButton对象
+                ButtonGroup group = new ButtonGroup();
                 //添加JRadioButton到ButtonGroup中
-                switch (Difficulty_in[0]){
+                switch (Difficulty_in[0]) {
                     case 1:
                         rb1.setSelected(true);
                     case 2:
@@ -1053,12 +1063,12 @@ public class Battlefield extends Frame {
                 panel.add(rb3);
                 panel.add(rb4);
 
-                JPanel panel2=new JPanel();
-                JLabel label2=new JLabel("选择机型：");
-                JRadioButton rb5=new JRadioButton("单发");    //创建JRadioButton对象
-                JRadioButton rb6=new JRadioButton("双发");    //创建JRadioButton对象
+                JPanel panel2 = new JPanel();
+                JLabel label2 = new JLabel("选择机型：");
+                JRadioButton rb5 = new JRadioButton("单发");    //创建JRadioButton对象
+                JRadioButton rb6 = new JRadioButton("双发");    //创建JRadioButton对象
                 ButtonGroup group2 = new ButtonGroup();
-                switch (planeSelect_in[0]){
+                switch (planeSelect_in[0]) {
                     case 1:
                         rb5.setSelected(true);
                     case 2:
@@ -1078,18 +1088,18 @@ public class Battlefield extends Frame {
                 panel3.add(confirm);
                 panel3.add(cancel);
 
-                frame.add(panel,BorderLayout.NORTH);
-                frame.add(panel2,BorderLayout.CENTER);
-                frame.add(panel3,BorderLayout.SOUTH);
+                frame.add(panel, BorderLayout.NORTH);
+                frame.add(panel2, BorderLayout.CENTER);
+                frame.add(panel3, BorderLayout.SOUTH);
 
-                label1.setFont(new Font("黑体",Font.BOLD,24));    //修改字体样式
-                label2.setFont(new Font("黑体",Font.BOLD,24));
-                rb1.setFont(new Font("黑体",Font.BOLD,24));
-                rb2.setFont(new Font("黑体",Font.BOLD,24));
-                rb3.setFont(new Font("黑体",Font.BOLD,24));
-                rb4.setFont(new Font("黑体",Font.BOLD,24));
-                rb5.setFont(new Font("黑体",Font.BOLD,24));
-                rb6.setFont(new Font("黑体",Font.BOLD,24));
+                label1.setFont(new Font("黑体", Font.BOLD, 24));    //修改字体样式
+                label2.setFont(new Font("黑体", Font.BOLD, 24));
+                rb1.setFont(new Font("黑体", Font.BOLD, 24));
+                rb2.setFont(new Font("黑体", Font.BOLD, 24));
+                rb3.setFont(new Font("黑体", Font.BOLD, 24));
+                rb4.setFont(new Font("黑体", Font.BOLD, 24));
+                rb5.setFont(new Font("黑体", Font.BOLD, 24));
+                rb6.setFont(new Font("黑体", Font.BOLD, 24));
 
                 frame.setBounds(250, 600, 500, 200);
                 frame.setVisible(true);
@@ -1104,18 +1114,18 @@ public class Battlefield extends Frame {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         // 设置难度
-                        if(rb1.isSelected())
+                        if (rb1.isSelected())
                             Difficulty_in[0] = 1;
-                        else if(rb2.isSelected())
+                        else if (rb2.isSelected())
                             Difficulty_in[0] = 2;
-                        else if(rb3.isSelected())
+                        else if (rb3.isSelected())
                             Difficulty_in[0] = 3;
-                        else if(rb4.isSelected())
+                        else if (rb4.isSelected())
                             Difficulty_in[0] = 4;
                         // 设置机型贴图(子弹贴图、子弹类型)
-                        if(rb5.isSelected())
+                        if (rb5.isSelected())
                             planeSelect_in[0] = 1;
-                        else if(rb6.isSelected())
+                        else if (rb6.isSelected())
                             planeSelect_in[0] = 2;
 
                         frame.dispose();
